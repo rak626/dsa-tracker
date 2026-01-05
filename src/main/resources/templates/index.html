@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>DSA Tracker UI</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"/>
+
+    <style>
+        .success-msg {
+            color: #198754;
+            font-weight: 600;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        .form-check-input {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<div class="container py-4">
+
+    <h2 class="mb-4 text-center">DSA Tracker</h2>
+
+    <div class="col-md-12">
+        <a href="/questions" class="btn btn-outline-dark mb-3">View All Questions</a>
+        <a href="/random" class="btn btn-info mb-3">Open Random Problem</a>
+    </div>
+
+
+    <!-- Add Question Card -->
+    <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+            Add Question
+        </div>
+
+        <div class="card-body">
+
+            <form th:action="@{/add}" th:object="${request}" method="post" class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Problem Link *</label>
+                    <input class="form-control" th:field="*{problemLink}" required/>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Problem Name</label>
+                    <input class="form-control" th:field="*{problemName}"/>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Video Id</label>
+                    <input class="form-control" th:field="*{videoId}"/>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Platform</label>
+                    <input class="form-control" th:field="*{platform}" placeholder="LEETCODE / GFG"/>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Difficulty</label>
+                    <select class="form-select" th:field="*{difficulty}">
+                        <option value="">-- Select --</option>
+                        <option value="EASY">EASY</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="HARD">HARD</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Topics (comma separated)</label>
+                    <input class="form-control" name="topicsInput" placeholder="Array, Hash Table"/>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Patterns (comma separated)</label>
+                    <input class="form-control" name="patternsInput" placeholder="Two Pointers"/>
+                </div>
+
+
+                <div class="col-md-3 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0">Solved?</label>
+                    <input class="form-check-input" type="checkbox" th:field="*{solved}"/>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0">Revise Count</label>
+                    <input class="form-control" type="number" th:field="*{reviseCount}" style="width: 100px"/>
+                </div>
+
+
+                <div class="col-12">
+                    <button class="btn btn-primary">Save</button>
+                </div>
+
+
+                <!-- SUCCESS MESSAGE -->
+                <div class="col-12" th:if="${successMessage}">
+                    <span class="success-msg">
+                        ✔ <span th:text="${successMessage}"></span>
+                    </span>
+                </div>
+
+                <!-- ERROR MESSAGE -->
+                <div class="col-12" th:if="${errorMessage}">
+                    <span class="error-msg">
+                        ✖ <span th:text="${errorMessage}"></span>
+                    </span>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

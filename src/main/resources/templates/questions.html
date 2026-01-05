@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Questions</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <style>
+
+        /* Make table rows cleaner */
+        table td {
+            vertical-align: middle;
+        }
+
+        /* Action button group container */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* Standardize button height + spacing */
+        .action-buttons .btn {
+            padding: 4px 10px;
+            font-size: 12px;
+            line-height: 1.2;
+            border-radius: 8px;
+        }
+
+        /* Separate primary destructive actions */
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #f4b942;
+            color: black;
+        }
+
+        .btn-toggle {
+            border: 1px solid #198754;
+            color: #198754;
+        }
+
+        .btn-revise {
+            border: 1px solid #0dcaf0;
+            color: #0dcaf0;
+        }
+        .topic-badge {
+            background-color: #5082d3;
+            border-radius: 12px;
+            padding: 3px 8px;
+            margin-right: 4px;
+            font-size: 0.75rem;
+        }
+    </style>
+
+
+</head>
+
+<body class="bg-light">
+
+<div class="container py-4">
+
+    <h2>All Questions</h2>
+
+    <a href="/" class="btn btn-primary mb-3">Add New Question</a>
+    <a href="/export/excel" class="btn btn-success mb-3">Export to Excel</a>
+
+
+    <!-- Alerts -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+
+    <!-- Filter Form -->
+    <form method="get" class="row g-2 mb-3">
+
+        <div class="col-md-3">
+            <input class="form-control" name="search" th:value="${search}" placeholder="Search…"/>
+        </div>
+
+        <div class="col-md-2">
+            <select class="form-select" name="difficulty" th:value="${difficulty}">
+                <option value="">All Difficulty</option>
+                <option value="EASY">EASY</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HARD">HARD</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <input class="form-control" name="platform" th:value="${platform}" placeholder="Platform"/>
+        </div>
+
+        <div class="col-md-2">
+            <input class="form-control" name="topic" th:value="${topic}" placeholder="Topic"/>
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-outline-primary w-100">Filter</button>
+        </div>
+
+    </form>
+
+
+    <!-- Table -->
+    <div class="card shadow-sm">
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-striped align-middle">
+
+                <thead>
+                <tr>
+                    <th>VideoId</th>
+                    <th>Link</th>
+                    <th>Name</th>
+                    <th>Platform</th>
+                    <th>Difficulty</th>
+                    <th>Topic</th>
+                    <th>Solved</th>
+                    <th>Revise</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="q : ${questions}">
+                    <td th:text="${q.videoId}"></td>
+                    <td><a th:href="${q.problemLink}" th:text="${q.problemLink}" target="_blank"></a></td>
+                    <td th:text="${q.problemName}"></td>
+                    <td th:text="${q.platform}"></td>
+                    <td th:text="${q.difficulty}"></td>
+                    <td>
+                        <span th:each="t : ${q.topics}" th:text="${t}" class="topic-badge"></span>
+                    </td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${q.solved} ? 'bg-success' : 'bg-secondary'"
+                              th:text="${q.solved} ? 'Solved' : 'Pending'">
+                        </span>
+                    </td>
+
+                    <td th:text="${q.reviseCount}"></td>
+
+                    <td>
+                        <div class="action-buttons">
+
+                            <a th:href="@{/solve/{id}(id=${q.id})}"
+                               class="btn btn-toggle">
+                                Toggle
+                            </a>
+
+                            <a th:href="@{/revise/{id}(id=${q.id})}"
+                               class="btn btn-revise">
+                                +Revise
+                            </a>
+
+                            <a th:href="@{/edit/{id}(id=${q.id})}"
+                               class="btn btn-edit">
+                                Edit
+                            </a>
+
+                            <a th:href="@{/delete/{id}(id=${q.id})}"
+                               class="btn btn-delete">
+                                Delete
+                            </a>
+
+                        </div>
+                    </td>
+
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+
+            <!-- Pagination -->
+            <nav th:if="${page.totalPages > 1}">
+                <ul class="pagination">
+
+                    <li class="page-item" th:classappend="${page.first}? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/questions(page=${page.number-1},search=${search},difficulty=${difficulty},platform=${platform},topic=${topic})}">
+                            Prev
+                        </a>
+                    </li>
+
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0,page.totalPages-1)}"
+                        th:classappend="${i==page.number}? 'active'">
+
+                        <a class="page-link"
+                           th:text="${i+1}"
+                           th:href="@{/questions(page=${i},search=${search},difficulty=${difficulty},platform=${platform},topic=${topic})}">
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${page.last}? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/questions(page=${page.number+1},search=${search},difficulty=${difficulty},platform=${platform},topic=${topic})}">
+                            Next
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

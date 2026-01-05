@@ -1,0 +1,15 @@
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: dsa-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rakesh
+      MONGO_INITDB_ROOT_PASSWORD: rakesh123_admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db   # Persistent Named Volume
+
+volumes:
+  mongo_data:

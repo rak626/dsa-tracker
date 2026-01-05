@@ -1,0 +1,9 @@
+server:
+  port: 5050
+
+spring:
+  application:
+    name: dsa-tracker
+  data:
+    mongodb:
+      uri: mongodb://rakesh:rakesh123_admin@mongodb:27017/dsa_tracker?authSource=admin

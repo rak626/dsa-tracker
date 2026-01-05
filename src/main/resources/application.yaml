@@ -1,0 +1,9 @@
+server:
+  port: 7008
+
+spring:
+  application:
+    name: dsa-tracker
+  data:
+    mongodb:
+      uri: mongodb://rakesh:rakesh123_admin@localhost:27017/dsa_tracker?authSource=admin
