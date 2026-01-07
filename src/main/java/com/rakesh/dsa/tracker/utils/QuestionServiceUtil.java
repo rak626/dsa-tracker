@@ -18,7 +18,7 @@ public class QuestionServiceUtil {
             // get first part before dot
             String platform = host.split("\\.")[0];
 
-            return platform.toUpperCase();
+            return platform.toLowerCase();
         } catch (Exception e) {
             return "UNKNOWN";
         }
@@ -37,7 +37,10 @@ public class QuestionServiceUtil {
             // get last non-empty segment
             String slug = null;
             for (int i = parts.length - 1; i >= 0; i--) {
-                if (parts[i] != null && !parts[i].isBlank()) {
+                if (parts[i] != null
+                        && !parts[i].isBlank()
+                        && !parts[i].matches("\\d+")
+                        && !parts[i].equalsIgnoreCase("description")) {
                     slug = parts[i];
                     break;
                 }

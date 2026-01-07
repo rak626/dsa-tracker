@@ -3,22 +3,24 @@ package com.rakesh.dsa.tracker.model.dto;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class CreateQuestionRequest {
 
-    private String videoId;       // optional
+    private String videoId;
 
     private String problemLink;
-    private String problemName;   // optional if blank you can still allow manual entry
+    private String problemName;
 
     private String platform;
     private String difficulty;
 
-    private List<String> topics;
-    private List<String> patterns;
+    // Names only — NOT entities
+    private Set<String> topics;
+    private Set<String> patterns;
 
-    private boolean isSolved;
+    private boolean solved;
 
     private Integer reviseCount;
 }

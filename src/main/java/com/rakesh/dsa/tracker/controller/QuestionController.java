@@ -31,13 +31,13 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteQuestion(@PathVariable String id) {
+    public ResponseEntity<?> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.ok("Delete question with id: " + id);
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<?> updateQuestion(@PathVariable String id, @RequestBody CreateQuestionRequest request) {
+    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @RequestBody CreateQuestionRequest request) {
         return ResponseEntity.ok(questionService.updateQuestion(id, request));
     }
 

@@ -4,6 +4,16 @@ server:
 spring:
   application:
     name: dsa-tracker
-  data:
-    mongodb:
-      uri: mongodb://rakesh:rakesh123_admin@mongodb:27017/dsa_tracker?authSource=admin
+  datasource:
+    url: jdbc:postgresql://postgres:5432/dsa_tracker
+    username: rakesh
+    password: rakesh123_admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # use validate/create-drop in prod as appropriate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

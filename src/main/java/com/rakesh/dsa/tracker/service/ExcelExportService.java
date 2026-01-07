@@ -1,6 +1,9 @@
 package com.rakesh.dsa.tracker.service;
 
+import com.rakesh.dsa.tracker.model.DifficultyType;
+import com.rakesh.dsa.tracker.model.Pattern;
 import com.rakesh.dsa.tracker.model.Question;
+import com.rakesh.dsa.tracker.model.Topic;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -10,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExcelExportService {
@@ -66,20 +70,19 @@ public class ExcelExportService {
 
             Row row = sheet.createRow(rowIdx++);
 
-            createCell(row, 0, q.getVideoId(), bodyStyle);
-            createCell(row, 1, q.getProblemName(), bodyStyle);
-            createCell(row, 2, q.getPlatform(), bodyStyle);
+            createCell(row, 0, safe(q.getVideoId()), bodyStyle);
+            createCell(row, 1, safe(q.getProblemName()), bodyStyle);
+            createCell(row, 2, safe(q.getPlatform()), bodyStyle);
 
-            // Difficulty (colored)
-            CellStyle diffStyle = switch (q.getDifficulty().toLowerCase()) {
-                case "easy" -> easyStyle;
-                case "medium" -> mediumStyle;
-                case "hard" -> hardStyle;
-                default -> bodyStyle;
-            };
-            createCell(row, 3, q.getDifficulty(), diffStyle);
+            // Difficulty (ENUM-safe)
+            CellStyle diffStyle = getDifficultyStyle(q.getDifficulty(),
+                    easyStyle, mediumStyle, hardStyle, bodyStyle);
 
-            // Solved (colored)
+            createCell(row, 3,
+                    q.getDifficulty() != null ? q.getDifficulty().name() : "",
+                    diffStyle);
+
+            // Solved
             createCell(
                     row,
                     4,
@@ -87,17 +90,17 @@ public class ExcelExportService {
                     q.isSolved() ? solvedStyle : unsolvedStyle
             );
 
-            // Revise Count (NEW COLUMN)
+            // Revise Count
             createCell(
                     row,
                     5,
-                    String.valueOf(q.getReviseCount()),
+                    String.valueOf(q.getReviseCount() == null ? 0 : q.getReviseCount()),
                     bodyStyle
             );
 
-            // Problem Link (clickable hyperlink)
+            // Hyperlink
             Cell linkCell = row.createCell(6);
-            linkCell.setCellValue(q.getProblemLink());
+            linkCell.setCellValue(safe(q.getProblemLink()));
             linkCell.setCellStyle(linkStyle);
 
             Hyperlink hyperlink =
@@ -105,8 +108,27 @@ public class ExcelExportService {
             hyperlink.setAddress(q.getProblemLink());
             linkCell.setHyperlink(hyperlink);
 
-            createCell(row, 7, String.join(", ", q.getTopics()), bodyStyle);
-            createCell(row, 8, String.join(", ", q.getPatterns()), bodyStyle);
+            // Topics (entity → name)
+            createCell(
+                    row,
+                    7,
+                    q.getTopics() == null ? "" :
+                            q.getTopics().stream()
+                                    .map(Topic::getName)
+                                    .collect(Collectors.joining(", ")),
+                    bodyStyle
+            );
+
+            // Patterns (entity → name)
+            createCell(
+                    row,
+                    8,
+                    q.getPatterns() == null ? "" :
+                            q.getPatterns().stream()
+                                    .map(Pattern::getName)
+                                    .collect(Collectors.joining(", ")),
+                    bodyStyle
+            );
         }
 
         // ---------- Sheet Enhancements ----------
@@ -127,6 +149,26 @@ public class ExcelExportService {
     // =========================================================
     // Helper Methods
     // =========================================================
+
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private CellStyle getDifficultyStyle(
+            DifficultyType difficulty,
+            CellStyle easy,
+            CellStyle medium,
+            CellStyle hard,
+            CellStyle defaultStyle) {
+
+        if (difficulty == null) return defaultStyle;
+
+        return switch (difficulty) {
+            case EASY -> easy;
+            case MEDIUM -> medium;
+            case HARD -> hard;
+        };
+    }
 
     private void createCell(Row row, int col, String value, CellStyle style) {
         Cell cell = row.createCell(col);
@@ -174,22 +216,13 @@ public class ExcelExportService {
     private CellStyle createBaseStyle(Workbook wb) {
         CellStyle style = wb.createCellStyle();
 
-        // Borders
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
 
-        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
-        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
-
-        // Alignment
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
-
-        // Wrap text
         style.setWrapText(true);
 
         return style;

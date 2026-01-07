@@ -1,19 +1,25 @@
 package com.rakesh.dsa.tracker.service;
 
+import com.rakesh.dsa.tracker.model.DifficultyType;
+import com.rakesh.dsa.tracker.model.Pattern;
 import com.rakesh.dsa.tracker.model.Question;
+import com.rakesh.dsa.tracker.model.Topic;
 import com.rakesh.dsa.tracker.model.dto.CreateQuestionRequest;
+import com.rakesh.dsa.tracker.repository.PatternRepository;
 import com.rakesh.dsa.tracker.repository.QuestionRepository;
+import com.rakesh.dsa.tracker.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.rakesh.dsa.tracker.utils.QuestionServiceUtil.detectPlatform;
@@ -23,141 +29,191 @@ import static com.rakesh.dsa.tracker.utils.QuestionServiceUtil.detectProblemName
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final QuestionRepository repository;
-    private final MongoTemplate mongoTemplate;
+    private final QuestionRepository questionRepository;
+    private final TopicRepository topicRepository;
+    private final PatternRepository patternRepository;
 
     public Question create(CreateQuestionRequest request) {
 
-        if (request.getProblemLink() == null || !StringUtils.hasText(request.getProblemLink())) {
+        if (!StringUtils.hasText(request.getProblemLink())) {
             throw new IllegalArgumentException("Problem link is required");
         }
 
-        String platform = request.getPlatform() != null && StringUtils.hasText(request.getPlatform()) ? request.getPlatform() : detectPlatform(request.getProblemLink());
+        String platform = StringUtils.hasText(request.getPlatform())
+                ? request.getPlatform()
+                : detectPlatform(request.getProblemLink());
 
-        String problemName = request.getProblemName() != null && StringUtils.hasText(request.getProblemName()) ? request.getProblemName() : detectProblemName(request.getProblemLink());
+        String problemName = StringUtils.hasText(request.getProblemName())
+                ? request.getProblemName()
+                : detectProblemName(request.getProblemLink());
 
         Question q = Question.builder()
                 .videoId(request.getVideoId())
                 .problemName(problemName)
                 .problemLink(request.getProblemLink())
                 .platform(platform)
-                .difficulty(request.getDifficulty())
-                .topics(request.getTopics())
-                .patterns(request.getPatterns())
+                .difficulty(DifficultyType.valueOf(request.getDifficulty()))
                 .solved(request.isSolved())
                 .reviseCount(request.getReviseCount())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
                 .build();
 
-        return repository.save(q);
+        q.setTopics(resolveTopics(request.getTopics()));
+        q.setPatterns(resolvePatterns(request.getPatterns()));
+
+        return questionRepository.save(q);
     }
 
-    public List<Question> getAllQuestions() {
-        return repository.findAll(Sort.by(Sort.Direction.DESC, "updatedAt"));
+    private Set<Topic> resolveTopics(Set<String> names) {
+        if (names == null) return Set.of();
+
+        Set<Topic> result = new HashSet<>();
+        for (String name : names) {
+            result.add(
+                    topicRepository.findByName(name)
+                            .orElseGet(() -> topicRepository.save(new Topic(null, name)))
+            );
+        }
+        return result;
     }
 
-    public void deleteQuestion(String id) {
-        repository.deleteById(id);
+    private Set<Pattern> resolvePatterns(Set<String> names) {
+        if (names == null) return Set.of();
+
+        Set<Pattern> result = new HashSet<>();
+        for (String name : names) {
+            result.add(
+                    patternRepository.findByName(name)
+                            .orElseGet(() -> patternRepository.save(new Pattern(null, name)))
+            );
+        }
+        return result;
     }
 
-    public Question updateQuestion(String id, CreateQuestionRequest req) {
-        Question existingQuestion = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Question with id " + id + " not found"));
+    public Page<Question> list(
+            String search,
+            String difficulty,
+            String platform,
+            String topic,
+            String pattern,
+            int page,
+            int size
+    ) {
 
-        if (req.getProblemLink() != null && StringUtils.hasText(req.getProblemLink())) {
-            existingQuestion.setProblemLink(req.getProblemLink());
-        }
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "updatedAt")
+        );
 
-        if (req.getProblemName() != null && StringUtils.hasText(req.getProblemName())) {
-            existingQuestion.setProblemName(req.getProblemName());
-        }
+        String normalizedSearch =
+                (search == null || search.isBlank())
+                        ? null
+                        : "%" + search.toLowerCase() + "%";
 
-        if (req.getPlatform() != null && StringUtils.hasText(req.getPlatform())) {
-            existingQuestion.setPlatform(req.getPlatform());
-        }
+        DifficultyType difficultyEnum =
+                (difficulty == null || difficulty.isBlank())
+                        ? null
+                        : DifficultyType.valueOf(difficulty);
 
-        if (req.getDifficulty() != null && StringUtils.hasText(req.getDifficulty())) {
-            existingQuestion.setDifficulty(req.getDifficulty());
-        }
+        String normalizedPlatform =
+                (platform == null || platform.isBlank())
+                        ? null
+                        : platform;
 
-        if (req.getTopics() != null) {
-            existingQuestion.setTopics(req.getTopics());
-        }
+        String normalizedTopic =
+                (topic == null || topic.isBlank())
+                        ? null
+                        : topic;
 
-        if (req.getPatterns() != null) {
-            existingQuestion.setPatterns(req.getPatterns());
-        }
+        String normalizedPattern =
+                (pattern == null || pattern.isBlank())
+                        ? null
+                        : pattern;
 
-        if(req.getVideoId() != null) {
-            existingQuestion.setVideoId(req.getVideoId());
-        }
-        existingQuestion.setSolved(req.isSolved());
-
-        if (req.getReviseCount() != null) {
-            existingQuestion.setReviseCount(req.getReviseCount());
-        }
-
-        existingQuestion.setUpdatedAt(Instant.now());
-
-        return repository.save(existingQuestion);
+        return questionRepository.findAllWithFilters(
+                normalizedSearch,
+                difficultyEnum,
+                normalizedPlatform,
+                normalizedTopic,
+                normalizedPattern,
+                pageable
+        );
     }
 
 
     public String getRandomQuestion() {
-
-        List<Question> allQuestions = repository.findAll();
-
-        if (allQuestions.isEmpty()) {
-            throw new NoSuchElementException("No questions available");
-        }
-
-        int index = ThreadLocalRandom.current().nextInt(allQuestions.size());
-        return allQuestions.get(index).getProblemLink();
+        List<Question> all = questionRepository.findAll();
+        if (all.isEmpty()) throw new NoSuchElementException("No questions available");
+        return all.get(ThreadLocalRandom.current().nextInt(all.size())).getProblemLink();
     }
 
-    public Page<Question> list(String search, String difficulty, String platform, String topic, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        Query query = new Query().with(pageable);
-
-        // search filter
-        if (search != null && !search.isBlank()) {
-            query.addCriteria(new Criteria().orOperator(Criteria.where("problemName").regex(search, "i"), Criteria.where("problemLink").regex(search, "i")));
-        }
-
-        if (difficulty != null && !difficulty.isBlank()) {
-            query.addCriteria(Criteria.where("difficulty").is(difficulty));
-        }
-
-        if (platform != null && !platform.isBlank()) {
-            query.addCriteria(Criteria.where("platform").is(platform));
-        }
-
-        if (topic != null && !topic.isBlank()) {
-            query.addCriteria(Criteria.where("topics").is(topic));
-        }
-
-        long total = mongoTemplate.count(query, Question.class);
-
-        List<Question> results = mongoTemplate.find(query, Question.class);
-
-        return new PageImpl<>(results, pageable, total);
-    }
-
-
-    public Question toggleSolved(String id) {
-        Question q = repository.findById(id).orElseThrow();
+    public Question toggleSolved(Long id) {
+        Question q = questionRepository.findById(id).orElseThrow();
         q.setSolved(!q.isSolved());
-        q.setUpdatedAt(Instant.now());
-        return repository.save(q);
+        return questionRepository.save(q);
     }
 
-    public Question incrementRevise(String id) {
-        Question q = repository.findById(id).orElseThrow();
+    public Question incrementRevise(Long id) {
+        Question q = questionRepository.findById(id).orElseThrow();
         q.setReviseCount((q.getReviseCount() == null ? 0 : q.getReviseCount()) + 1);
-        q.setUpdatedAt(Instant.now());
-        return repository.save(q);
+        return questionRepository.save(q);
+    }
+
+    public List<Question> getAllQuestions() {
+        return questionRepository.findAll();
+    }
+
+    public void deleteQuestion(Long id) {
+        questionRepository.deleteById(id);
+    }
+
+    public Question updateQuestion(Long id, CreateQuestionRequest req) {
+
+        Question q = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+
+        if (StringUtils.hasText(req.getProblemLink())) {
+            q.setProblemLink(req.getProblemLink());
+        }
+
+        if (StringUtils.hasText(req.getProblemName())) {
+            q.setProblemName(req.getProblemName());
+        }
+
+        if (StringUtils.hasText(req.getPlatform())) {
+            q.setPlatform(req.getPlatform());
+        }
+
+        if (StringUtils.hasText(req.getDifficulty())) {
+            q.setDifficulty(DifficultyType.valueOf(req.getDifficulty()));
+        }
+
+        if (req.getVideoId() != null) {
+            q.setVideoId(req.getVideoId());
+        }
+
+        if (req.getReviseCount() != null) {
+            q.setReviseCount(req.getReviseCount());
+        }
+
+        // 🔴 FIXED: resolve topic names → Topic entities
+        if (req.getTopics() != null) {
+            q.setTopics(resolveTopics(req.getTopics()));
+        }
+
+        // 🔴 FIXED: resolve pattern names → Pattern entities
+        if (req.getPatterns() != null) {
+            q.setPatterns(resolvePatterns(req.getPatterns()));
+        }
+
+        q.setSolved(req.isSolved());
+
+        return questionRepository.save(q);
     }
 
 
+    public Question getQuestionById(Long id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Question not found"));
+    }
 }

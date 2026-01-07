@@ -3,9 +3,9 @@
 
 <head>
     <title>Questions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet"/>
+    <link href="/css/global.css" rel="stylesheet"/>
     <style>
 
         /* Make table rows cleaner */
@@ -48,11 +48,9 @@
             border: 1px solid #0dcaf0;
             color: #0dcaf0;
         }
+
         .topic-badge {
             background-color: #5082d3;
-            border-radius: 12px;
-            padding: 3px 8px;
-            margin-right: 4px;
             font-size: 0.75rem;
         }
     </style>
@@ -60,7 +58,7 @@
 
 </head>
 
-<body class="bg-light">
+<body>
 
 <div class="container py-4">
 
@@ -83,12 +81,14 @@
         </div>
 
         <div class="col-md-2">
-            <select class="form-select" name="difficulty" th:value="${difficulty}">
-                <option value="">All Difficulty</option>
-                <option value="EASY">EASY</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="HARD">HARD</option>
-            </select>
+            <label>
+                <select class="form-select" name="difficulty" th:value="${difficulty}">
+                    <option value="">All Difficulty</option>
+                    <option value="EASY">EASY</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HARD">HARD</option>
+                </select>
+            </label>
         </div>
 
         <div class="col-md-2">
@@ -100,27 +100,53 @@
         </div>
 
         <div class="col-md-2">
-            <button class="btn btn-outline-primary w-100">Filter</button>
+            <input class="form-control" name="pattern" th:value="${pattern}" placeholder="Pattern"/>
         </div>
 
+        <div class="col-md-1">
+            <label>
+                <select class="form-select"
+                        name="size"
+                        onchange="this.form.submit()">
+
+                    <!-- Default label -->
+                    <option value="5" th:selected="${size == 5}">5</option>
+                    <option value="10" th:selected="${size == 10}">10</option>
+                    <option value="20" th:selected="${size == 20}">20</option>
+                    <option value="50" th:selected="${size == 50}">50</option>
+
+                </select>
+            </label>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-outline-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-2">
+            <a class="btn btn-outline-secondary w-100"
+               th:href="@{/questions}">
+                Reset
+            </a>
+        </div>
+
+        <input type="hidden" name="page" value="0"/>
     </form>
 
 
     <!-- Table -->
     <div class="card shadow-sm">
 
-        <div class="card-body table-responsive">
+        <div class="card-body">
 
-            <table class="table table-striped align-middle">
+            <table class="table table-striped align-middle table-hover table-responsive">
 
                 <thead>
                 <tr>
                     <th>VideoId</th>
-                    <th>Link</th>
-                    <th>Name</th>
+                    <th>Problem</th>
                     <th>Platform</th>
                     <th>Difficulty</th>
                     <th>Topic</th>
+                    <th>Pattern</th>
                     <th>Solved</th>
                     <th>Revise</th>
                     <th>Actions</th>
@@ -131,13 +157,36 @@
 
                 <tr th:each="q : ${questions}">
                     <td th:text="${q.videoId}"></td>
-                    <td><a th:href="${q.problemLink}" th:text="${q.problemLink}" target="_blank"></a></td>
-                    <td th:text="${q.problemName}"></td>
-                    <td th:text="${q.platform}"></td>
-                    <td th:text="${q.difficulty}"></td>
                     <td>
-                        <span th:each="t : ${q.topics}" th:text="${t}" class="topic-badge"></span>
+                        <a th:href="${q.problemLink}"
+                           th:text="${q.problemName}"
+                           target="_blank"
+                           class="text-decoration-none fw-semibold">
+                        </a>
                     </td>
+
+                    <td th:text="${q.platform}"></td>
+                    <td th:text="${q.difficultyLabel}"></td>
+                    <td>
+                        <span th:if="${q.topicNames != null}">
+                            <span th:each="t : ${#strings.arraySplit(q.topicNames, ',')}"
+                                  class="badge topic-badge me-1"
+                                  th:text="${t}">
+                            </span>
+                        </span>
+                    </td>
+
+
+                    <td>
+                        <span th:if="${q.patternNames != null}">
+                            <span th:each="p : ${#strings.arraySplit(q.patternNames, ',')}"
+                                  class="badge bg-secondary me-1"
+                                  th:text="${p}">
+                            </span>
+                        </span>
+                    </td>
+
+
                     <td>
                         <span class="badge"
                               th:classappend="${q.solved} ? 'bg-success' : 'bg-secondary'"
@@ -182,29 +231,56 @@
 
 
             <!-- Pagination -->
-            <nav th:if="${page.totalPages > 1}">
+            <nav th:if="${totalPages > 1}">
                 <ul class="pagination">
 
-                    <li class="page-item" th:classappend="${page.first}? 'disabled'">
+                    <!-- Prev -->
+                    <li class="page-item" th:classappend="${page == 0} ? 'disabled'">
                         <a class="page-link"
-                           th:href="@{/questions(page=${page.number-1},search=${search},difficulty=${difficulty},platform=${platform},topic=${topic})}">
+                           th:href="@{/questions(
+                   page=${page - 1},
+                   size=${size},
+                   search=${search},
+                   difficulty=${difficulty},
+                   platform=${platform},
+                   topic=${topic},
+                   pattern=${pattern}
+               )}">
                             Prev
                         </a>
                     </li>
 
+                    <!-- Page Numbers -->
                     <li class="page-item"
-                        th:each="i : ${#numbers.sequence(0,page.totalPages-1)}"
-                        th:classappend="${i==page.number}? 'active'">
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == page} ? 'active'">
 
                         <a class="page-link"
-                           th:text="${i+1}"
-                           th:href="@{/questions(page=${i},search=${search},difficulty=${difficulty},platform=${platform},topic=${topic})}">
+                           th:text="${i + 1}"
+                           th:href="@{/questions(
+                   page=${i},
+                   size=${size},
+                   search=${search},
+                   difficulty=${difficulty},
+                   platform=${platform},
+                   topic=${topic},
+                   pattern=${pattern}
+               )}">
                         </a>
                     </li>
 
-                    <li class="page-item" th:classappend="${page.last}? 'disabled'">
+                    <!-- Next -->
+                    <li class="page-item" th:classappend="${page == totalPages - 1} ? 'disabled'">
                         <a class="page-link"
-                           th:href="@{/questions(page=${page.number+1},search=${search},difficulty=${difficulty},platform=${platform},topic=${topic})}">
+                           th:href="@{/questions(
+                   page=${page + 1},
+                   size=${size},
+                   search=${search},
+                   difficulty=${difficulty},
+                   platform=${platform},
+                   topic=${topic},
+                   pattern=${pattern}
+               )}">
                             Next
                         </a>
                     </li>
@@ -212,10 +288,11 @@
                 </ul>
             </nav>
 
+
         </div>
     </div>
 
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
