@@ -1,3 +1,81 @@
-body {
-    background-color: #FFF2CC;
+:root {
+    --pico-font-size: 100%;
 }
+
+.page {
+    margin-top: calc(var(--pico-spacing) * 1.5);
+}
+
+.filters {
+    padding: var(--pico-spacing);
+}
+
+.actions {
+    margin-top: var(--pico-spacing);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pico-spacing);
+}
+
+.table-actions a {
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+}
+
+.form-card {
+    padding: var(--pico-spacing);
+}
+
+.actions-single {
+    margin-top: var(--pico-spacing);
+}
+
+fieldset > section {
+    margin-top: var(--pico-spacing);
+}
+
+
+/* ===== Filters Layout ===== */
+
+.filters {
+    padding: var(--pico-spacing);
+}
+
+/* Inputs grid */
+.filters-grid {
+    display: grid;
+    grid-template-columns: 3fr repeat(4, 1fr) 0.5fr;
+    grid-template-rows: 0.1fr;
+    grid-column-gap: var(--pico-spacing);
+    grid-row-gap: 0;
+
+}
+
+/* Container */
+.filter-button-group {
+    display: flex;
+    gap: 1rem;
+    width: 30%;          /* buttons together take half row */
+    margin: 1rem auto;   /* center horizontally */
+}
+
+/* Make both elements identical boxes */
+.filter-button,
+.filter-link {
+    flex: 1;                     /* equal width */     /* equal height */
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* Ensure <a> behaves like a button */
+.filter-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    background-color: #C52F21;
+    color: white;
+    border-radius: 4%;
+}
+

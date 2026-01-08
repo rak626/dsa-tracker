@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:fragment="parent(title,links, styles, content, scripts)">
+<head>
+    <title th:replace="${title}">DSA Tracker UI</title>
+    <!-- Bootstrap -->
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.jade.min.css"
+    >
+    <link href="/css/global.css" rel="stylesheet"/>
+    <th:block th:replace="${links}"></th:block>
+    <th:block th:replace="${styles}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="${content}">
+
+</div>
+
+<th:block th:replace="${scripts}"></th:block>
+</body>
+</html>
