@@ -28,7 +28,7 @@ public class QuestionViewController {
         request.setReviseCount(0); // optional UX improvement
 
         model.addAttribute("request", request);
-        return "index";
+        return QuestionViewConstants.INDEX;
     }
 
     // ================= CREATE =================
@@ -52,7 +52,7 @@ public class QuestionViewController {
             );
         }
 
-        return "redirect:/";
+        return QuestionViewConstants.REDIRECT_HOME;
     }
 
     // ================= LIST =================
@@ -103,7 +103,7 @@ public class QuestionViewController {
         model.addAttribute("pattern", pattern);
 
 
-        return "questions";
+        return QuestionViewConstants.QUESTIONS;
     }
 
 
@@ -115,7 +115,7 @@ public class QuestionViewController {
         Question q = questionService.getQuestionById(id);
         model.addAttribute("question", q);
 
-        return "edit";
+        return QuestionViewConstants.EDIT;
     }
 
     @PostMapping("/update/{id}")
@@ -138,7 +138,7 @@ public class QuestionViewController {
             );
         }
 
-        return "redirect:/questions";
+        return QuestionViewConstants.REDIRECT_QUESTIONS;
     }
 
     // ================= ACTIONS =================
@@ -147,19 +147,19 @@ public class QuestionViewController {
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         questionService.deleteQuestion(id);
         redirectAttributes.addFlashAttribute("successMessage", "Question deleted successfully.");
-        return "redirect:/questions";
+        return QuestionViewConstants.REDIRECT_QUESTIONS;
     }
 
     @GetMapping("/solve/{id}")
     public String toggleSolved(@PathVariable Long id) {
         questionService.toggleSolved(id);
-        return "redirect:/questions";
+        return QuestionViewConstants.REDIRECT_QUESTIONS;
     }
 
     @GetMapping("/revise/{id}")
     public String revise(@PathVariable Long id) {
         questionService.incrementRevise(id);
-        return "redirect:/questions";
+        return QuestionViewConstants.REDIRECT_QUESTIONS;
     }
 
     // ================= RANDOM =================
