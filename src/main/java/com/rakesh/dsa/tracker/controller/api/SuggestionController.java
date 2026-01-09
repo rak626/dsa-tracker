@@ -1,4 +1,4 @@
-package com.rakesh.dsa.tracker.controller;
+package com.rakesh.dsa.tracker.controller.api;
 
 import com.rakesh.dsa.tracker.model.Pattern;
 import com.rakesh.dsa.tracker.model.Topic;
