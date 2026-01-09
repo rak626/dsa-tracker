@@ -2,7 +2,6 @@ package com.rakesh.dsa.tracker.model.dto;
 
 import lombok.Data;
 
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -20,7 +19,7 @@ public class CreateQuestionRequest {
     private Set<String> topics;
     private Set<String> patterns;
 
-    private boolean solved;
+    private Boolean solved;
 
     private Integer reviseCount;
 }

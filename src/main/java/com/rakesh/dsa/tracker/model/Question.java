@@ -53,11 +53,14 @@ public class Question {
     )
     private List<Pattern> patterns = new ArrayList<>();
 
-    @Builder.Default
     private boolean solved = true;
 
     @Builder.Default
     private Integer reviseCount = 0;
+
+    @Column(name = "last_attempted_at")
+    private Instant lastAttemptedAt;
+
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -85,6 +88,5 @@ public class Question {
     public String getDifficultyLabel() {
         return difficulty == null ? "" : difficulty.name().toLowerCase();
     }
-
 
 }

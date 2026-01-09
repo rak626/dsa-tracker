@@ -16,7 +16,7 @@
     <!-- Form Card -->
     <article class="form-card">
 
-        <form th:action="@{/update/{id}(id=${question.id})}"
+        <form th:action="@{/questions/{id}(id=${question.id})}"
               th:object="${question}"
               method="post">
 

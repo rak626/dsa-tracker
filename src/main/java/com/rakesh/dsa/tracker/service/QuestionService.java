@@ -5,6 +5,7 @@ import com.rakesh.dsa.tracker.model.Pattern;
 import com.rakesh.dsa.tracker.model.Question;
 import com.rakesh.dsa.tracker.model.Topic;
 import com.rakesh.dsa.tracker.model.dto.CreateQuestionRequest;
+import com.rakesh.dsa.tracker.model.dto.DateFilterEnum;
 import com.rakesh.dsa.tracker.repository.PatternRepository;
 import com.rakesh.dsa.tracker.repository.QuestionRepository;
 import com.rakesh.dsa.tracker.repository.TopicRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -50,12 +52,12 @@ public class QuestionService {
                 .problemLink(request.getProblemLink())
                 .platform(platform)
                 .difficulty(DifficultyType.valueOf(request.getDifficulty()))
-                .solved(request.isSolved())
+                .solved(request.getSolved())
+                .lastAttemptedAt(request.getSolved() != null && request.getSolved() ? Instant.now() : null)
                 .reviseCount(request.getReviseCount())
+                .topics(resolveTopics(request.getTopics()))
+                .patterns(resolvePatterns(request.getPatterns()))
                 .build();
-
-        q.setTopics(resolveTopics(request.getTopics()));
-        q.setPatterns(resolvePatterns(request.getPatterns()));
 
         return questionRepository.save(q);
     }
@@ -92,6 +94,7 @@ public class QuestionService {
             String platform,
             String topic,
             String pattern,
+            String dateFilter,
             int page,
             int size
     ) {
@@ -127,12 +130,14 @@ public class QuestionService {
                         ? null
                         : pattern;
 
+        Instant normalizeFromInstant = DateFilterEnum.fromString(dateFilter).cutoff();
         return questionRepository.findAllWithFilters(
                 normalizedSearch,
                 difficultyEnum,
                 normalizedPlatform,
                 normalizedTopic,
                 normalizedPattern,
+                normalizeFromInstant,
                 pageable
         );
     }
@@ -145,14 +150,18 @@ public class QuestionService {
     }
 
     public Question toggleSolved(Long id) {
-        Question q = questionRepository.findById(id).orElseThrow();
+        Question q = questionRepository.findById(id).orElseThrow(() -> new RuntimeException("Question not found"));
         q.setSolved(!q.isSolved());
+        if (q.isSolved()) {
+            q.setLastAttemptedAt(Instant.now());
+        }
         return questionRepository.save(q);
     }
 
     public Question incrementRevise(Long id) {
         Question q = questionRepository.findById(id).orElseThrow();
         q.setReviseCount((q.getReviseCount() == null ? 0 : q.getReviseCount()) + 1);
+        q.setLastAttemptedAt(Instant.now());
         return questionRepository.save(q);
     }
 
@@ -191,19 +200,20 @@ public class QuestionService {
 
         if (req.getReviseCount() != null) {
             q.setReviseCount(req.getReviseCount());
+            q.setLastAttemptedAt(Instant.now());
         }
 
-        // 🔴 FIXED: resolve topic names → Topic entities
         if (req.getTopics() != null) {
             q.setTopics(resolveTopics(req.getTopics()));
         }
 
-        // 🔴 FIXED: resolve pattern names → Pattern entities
         if (req.getPatterns() != null) {
             q.setPatterns(resolvePatterns(req.getPatterns()));
         }
 
-        q.setSolved(req.isSolved());
+        if (req.getSolved() != null) {
+            q.setSolved(req.getSolved());
+        }
 
         return questionRepository.save(q);
     }
