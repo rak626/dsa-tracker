@@ -30,7 +30,7 @@
         <header>
             <strong>Add Question</strong>
         </header>
-<!--        <p th:text="${request}"></p>-->
+        <!--        <p th:text="${request}"></p>-->
         <form th:action="@{/add}" th:object="${request}" method="post">
 
             <fieldset>
@@ -71,27 +71,31 @@
                 </section>
 
                 <section class="grid">
-                    <label>
-                        Topics (comma separated)
-                        <input type="text"
-                               name="topicsInput"
-                               placeholder="Array, Hash Table">
-                    </label>
+                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                                        'Topics (comma separated)',
+                                                        'topicsInput',
+                                                        null,
+                                                        '/api/suggestions/topics',
+                                                        true,
+                                                        'Array, Hash Table'
+                                                    )}"/>
 
-                    <label>
-                        Patterns (comma separated)
-                        <input type="text"
-                               name="patternsInput"
-                               placeholder="Two Pointers">
-                    </label>
+                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                                    'Patterns (comma separated)',
+                                                    'patternsInput',
+                                                    null,
+                                                    '/api/suggestions/patterns',
+                                                    true,
+                                                    'Two Pointers'
+                                                )}"/>
                 </section>
+
 
                 <section class="grid">
                     <label>
                         <input type="checkbox" th:field="*{solved}">
                         Solved?
                     </label>
-
                     <label>
                         Revise Count
                         <input type="number"

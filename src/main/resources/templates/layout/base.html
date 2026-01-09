@@ -8,6 +8,7 @@
             href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.jade.min.css"
     >
     <link href="/css/global.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/autosuggest.css">
     <th:block th:replace="${links}"></th:block>
     <th:block th:replace="${styles}"></th:block>
 </head>
@@ -18,6 +19,8 @@
 
 </div>
 
+
+<script src="/js/autosuggest.js" defer></script>
 <th:block th:replace="${scripts}"></th:block>
 </body>
 </html>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,13 +75,8 @@ public class QuestionViewController {
                         ? platform.toUpperCase()
                         : null;
 
-        String normalizedSearch =
-                (search == null || search.isBlank())
-                        ? null
-                        : search.trim(); // ← keep controller responsibility minimal
-
         var result = questionService.list(
-                normalizedSearch,
+                search,
                 difficulty,
                 platformNormalized,
                 topic,
