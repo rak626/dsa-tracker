@@ -45,8 +45,11 @@
             <div class="filters-grid">
                 <label>
                     <input name="search"
+                           type="search"
                            th:value="${search}"
-                           placeholder="Search…">
+                           placeholder="Search Questions"
+                           aria-label="Search Questions"
+                    >
                 </label>
 
                 <label>
@@ -64,17 +67,24 @@
                            placeholder="Platform">
                 </label>
 
-                <label>
-                    <input name="topic"
-                           th:value="${topic}"
-                           placeholder="Topic">
-                </label>
+                <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                                        _,
+                                                        'topic',
+                                                        ${topic},
+                                                        '/api/suggestions/topics',
+                                                        false,
+                                                        'Topic'
+                                                    )}"/>
 
-                <label>
-                    <input name="pattern"
-                           th:value="${pattern}"
-                           placeholder="Pattern">
-                </label>
+                <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                                    _,
+                                                    'pattern',
+                                                    ${pattern},
+                                                    '/api/suggestions/patterns',
+                                                    false,
+                                                    'Pattern'
+                                                )}"/>
+
 
                 <label>
                     <select name="size" onchange="this.form.submit()">
@@ -154,7 +164,7 @@
                     <td class="table-actions">
                         <a th:href="@{/solve/{id}(id=${q.id})}" >Toggle</a>
                         <a th:href="@{/revise/{id}(id=${q.id})}" >+Revise</a>
-                        <a th:href="@{/edit/{id}(id=${q.id})}">Edit</a>
+                        <a th:href="@{/questions/edit/{id}(id=${q.id})}">Edit</a>
                         <a th:href="@{/delete/{id}(id=${q.id})}">
                             Delete
                         </a>

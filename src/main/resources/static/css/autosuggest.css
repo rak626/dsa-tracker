@@ -1,0 +1,26 @@
+.suggest-list {
+    position: absolute;
+    background: var(--pico-background-color);
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: 6px;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.suggest-item {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.suggest-item:hover {
+    background-color: var(--pico-muted-color);
+}
+
+.suggest-item.active {
+    background-color: var(--pico-primary-background);
+    color: var(--pico-primary-inverse);
+}

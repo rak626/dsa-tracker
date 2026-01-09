@@ -16,10 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.rakesh.dsa.tracker.utils.QuestionServiceUtil.detectPlatform;
@@ -63,10 +60,10 @@ public class QuestionService {
         return questionRepository.save(q);
     }
 
-    private Set<Topic> resolveTopics(Set<String> names) {
-        if (names == null) return Set.of();
+    private List<Topic> resolveTopics(Set<String> names) {
+        if (names == null) return List.of();
 
-        Set<Topic> result = new HashSet<>();
+        List<Topic> result = new ArrayList<>();
         for (String name : names) {
             result.add(
                     topicRepository.findByName(name)
@@ -76,10 +73,10 @@ public class QuestionService {
         return result;
     }
 
-    private Set<Pattern> resolvePatterns(Set<String> names) {
-        if (names == null) return Set.of();
+    private List<Pattern> resolvePatterns(Set<String> names) {
+        if (names == null) return List.of();
 
-        Set<Pattern> result = new HashSet<>();
+        List<Pattern> result = new ArrayList<>();
         for (String name : names) {
             result.add(
                     patternRepository.findByName(name)
@@ -108,7 +105,7 @@ public class QuestionService {
         String normalizedSearch =
                 (search == null || search.isBlank())
                         ? null
-                        : "%" + search.toLowerCase() + "%";
+                        : "%" + search.trim().toLowerCase() + "%";
 
         DifficultyType difficultyEnum =
                 (difficulty == null || difficulty.isBlank())
@@ -118,7 +115,7 @@ public class QuestionService {
         String normalizedPlatform =
                 (platform == null || platform.isBlank())
                         ? null
-                        : platform;
+                        : platform.toLowerCase();
 
         String normalizedTopic =
                 (topic == null || topic.isBlank())

@@ -16,7 +16,7 @@
     <!-- Form Card -->
     <article class="form-card">
 
-        <form th:action="@{/update/{id}(id=${question.id})}"
+        <form th:action="@{/questions/{id}(id=${question.id})}"
               th:object="${question}"
               method="post">
 
@@ -60,20 +60,25 @@
                 </section>
 
                 <section class="grid">
-                    <label>
-                        Topics (comma separated)
-                        <input type="text"
-                               name="topicsInput"
-                               th:value="${question.topicNames}">
-                    </label>
+                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                    'Topics (comma separated)',
+                                    'topicsInput',
+                                    ${question.topicNames},
+                                    '/api/suggestions/topics',
+                                    true,
+                                    'Array, Hash Table'
+                                )}"/>
 
-                    <label>
-                        Patterns (comma separated)
-                        <input type="text"
-                               name="patternsInput"
-                               th:value="${question.patternNames}">
-                    </label>
+                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                    'Patterns (comma separated)',
+                                    'patternsInput',
+                                    ${question.patternNames},
+                                    '/api/suggestions/patterns',
+                                    true,
+                                    'Two Pointers'
+                                )}"/>
                 </section>
+
 
                 <section class="grid">
                     <label>

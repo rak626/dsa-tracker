@@ -1,4 +1,4 @@
-package com.rakesh.dsa.tracker.controller;
+package com.rakesh.dsa.tracker.controller.api;
 
 import com.rakesh.dsa.tracker.model.Question;
 import com.rakesh.dsa.tracker.model.dto.CreateQuestionRequest;

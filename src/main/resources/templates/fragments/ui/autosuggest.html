@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<th:block th:fragment="autosuggest(label, name, value, endpoint, multi, placeholder)">
+    <label>
+        <span th:text="${label}"></span>
+        <input type="text"
+               th:name="${name}"
+               th:value="${value}"
+               th:placeholder="${placeholder}"
+               class="autosuggest"
+               th:attr="data-endpoint=${endpoint}, data-multi=${multi}">
+    </label>
+</th:block>
+
+</body>
+</html>

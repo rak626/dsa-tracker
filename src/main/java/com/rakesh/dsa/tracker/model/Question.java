@@ -6,8 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -36,21 +35,23 @@ public class Question {
     @Enumerated(EnumType.STRING)
     private DifficultyType difficulty;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "question_topics",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id")
     )
-    private Set<Topic> topics = new HashSet<>();
+    private List<Topic> topics = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "question_patterns",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "pattern_id")
     )
-    private Set<Pattern> patterns = new HashSet<>();
+    private List<Pattern> patterns = new ArrayList<>();
 
     @Builder.Default
     private boolean solved = true;
