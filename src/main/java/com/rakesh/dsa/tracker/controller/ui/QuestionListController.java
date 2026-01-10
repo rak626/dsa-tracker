@@ -22,6 +22,7 @@ public class QuestionListController {
             @RequestParam(required = false) String platform,
             @RequestParam(required = false) String topic,
             @RequestParam(required = false) String pattern,
+            @RequestParam(required = false) String dateFilter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             Model model
@@ -33,6 +34,7 @@ public class QuestionListController {
                 normalize(platform),
                 topic,
                 pattern,
+                dateFilter,
                 page,
                 size
         );

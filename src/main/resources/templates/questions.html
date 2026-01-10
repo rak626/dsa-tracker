@@ -162,12 +162,23 @@
                     <td th:text="${q.reviseCount}"></td>
 
                     <td class="table-actions">
-                        <a th:href="@{/solve/{id}(id=${q.id})}" >Toggle</a>
-                        <a th:href="@{/revise/{id}(id=${q.id})}" >+Revise</a>
-                        <a th:href="@{/questions/edit/{id}(id=${q.id})}">Edit</a>
-                        <a th:href="@{/delete/{id}(id=${q.id})}">
-                            Delete
+                        <a th:href="@{/questions/{id}/solve(id=${q.id})}">
+                            Toggle
                         </a>
+
+                        <a th:href="@{/questions/{id}/revise(id=${q.id})}">
+                            +Revise
+                        </a>
+
+                        <a th:href="@{/questions/edit/{id}(id=${q.id})}">
+                            Edit
+                        </a>
+
+                        <form th:action="@{/questions/{id}/delete(id=${q.id})}" method="post">
+                            <button type="submit">Delete</button>
+                        </form>
+
+
                     </td>
                 </tr>
                 </tbody>

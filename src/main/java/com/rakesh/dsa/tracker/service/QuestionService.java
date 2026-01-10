@@ -58,7 +58,6 @@ public class QuestionService {
                 .topics(resolveTopics(request.getTopics()))
                 .patterns(resolvePatterns(request.getPatterns()))
                 .build();
-
         return questionRepository.save(q);
     }
 
@@ -130,7 +129,10 @@ public class QuestionService {
                         ? null
                         : pattern;
 
-        Instant normalizeFromInstant = DateFilterEnum.fromString(dateFilter).cutoff();
+        Instant normalizeFromInstant =
+                (dateFilter == null || dateFilter.isBlank())
+                        ? Instant.EPOCH
+                        : DateFilterEnum.fromString(dateFilter).cutoff();
         return questionRepository.findAllWithFilters(
                 normalizedSearch,
                 difficultyEnum,

@@ -26,10 +26,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
                     AND (:platform IS NULL OR q.platform = :platform)
                     AND (:topic IS NULL OR t.name = :topic)
                     AND (:pattern IS NULL OR p.name = :pattern)
-                    AND (
-                        :fromInstant IS NULL
-                        OR (q.lastAttemptedAt IS NOT NULL AND q.lastAttemptedAt >= :fromInstant)
-                    )
+                    AND q.lastAttemptedAt >= :fromInstant
             """)
     Page<Question> findAllWithFilters(
             @Param("search") String search,

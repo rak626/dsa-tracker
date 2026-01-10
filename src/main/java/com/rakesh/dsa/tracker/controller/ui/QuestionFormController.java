@@ -27,7 +27,7 @@ public class QuestionFormController {
             questionService.create(request);
             ra.addFlashAttribute("successMessage", "Question added successfully");
         } catch (Exception e) {
-            ra.addFlashAttribute("errorMessage", e.getMessage());
+            ra.addFlashAttribute("errorMessage", "Failed to add question " + e.getMessage());
         }
         return QuestionViewConstants.REDIRECT_HOME;
     }
