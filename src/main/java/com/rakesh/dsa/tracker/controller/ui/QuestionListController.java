@@ -1,5 +1,6 @@
 package com.rakesh.dsa.tracker.controller.ui;
 
+import com.rakesh.dsa.tracker.model.QuestionFilter;
 import com.rakesh.dsa.tracker.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,24 +18,14 @@ public class QuestionListController {
 
     @GetMapping
     public String list(
-            @RequestParam(defaultValue = "") String search,
-            @RequestParam(required = false) String difficulty,
-            @RequestParam(required = false) String platform,
-            @RequestParam(required = false) String topic,
-            @RequestParam(required = false) String pattern,
-            @RequestParam(required = false) String dateFilter,
+            QuestionFilter questionFilter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             Model model
     ) {
 
         var result = questionService.list(
-                search,
-                difficulty,
-                normalize(platform),
-                topic,
-                pattern,
-                dateFilter,
+                questionFilter,
                 page,
                 size
         );
