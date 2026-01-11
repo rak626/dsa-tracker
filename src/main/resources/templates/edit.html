@@ -18,7 +18,9 @@
 
         <form th:action="@{/questions/{id}(id=${question.id})}"
               th:object="${question}"
-              method="post">
+              method="post"
+              th:id="updateForm"
+        >
 
             <fieldset>
 
@@ -57,6 +59,19 @@
                             <option value="HARD">HARD</option>
                         </select>
                     </label>
+                    <label>
+                        Solve Count
+                        <input type="number"
+                               th:field="*{solveCount}"
+                               min="0">
+                    </label>
+
+                    <label>
+                        Revise Count
+                        <input type="number"
+                               th:field="*{reviseCount}"
+                               min="0">
+                    </label>
                 </section>
 
                 <section class="grid">
@@ -78,38 +93,24 @@
                                     'Two Pointers'
                                 )}"/>
                 </section>
-
-
-                <section class="grid">
-                    <label>
-                        <input type="checkbox"
-                               th:field="*{solved}">
-                        Solved?
-                    </label>
-
-                    <label>
-                        Revise Count
-                        <input type="number"
-                               th:field="*{reviseCount}"
-                               min="0">
-                    </label>
-                </section>
-
             </fieldset>
-
-            <!-- Actions -->
-            <div class="filter-button-group">
-                <button type="submit" class="filter-button">
-                    Update
-                </button>
-
-                <a href="/questions" class="filter-link secondary">
-                    Cancel
-                </a>
-            </div>
-
         </form>
 
+        <form th:id="deleteForm" th:action="@{/questions/{id}/delete(id=${question.id})}" method="post">
+        </form>
+
+        <!-- Actions -->
+        <div class="grid">
+            <div></div>
+            <button type="submit" th:form="updateForm">
+                Update
+            </button>
+            <button type="submit" th:onclick="|window.location.href = '@{/questions}'|" class="secondary">
+                Cancel
+            </button>
+            <button type="submit" th:form="deleteForm" class="filter-link">Delete</button>
+            <div></div>
+        </div>
     </article>
 
 </section>

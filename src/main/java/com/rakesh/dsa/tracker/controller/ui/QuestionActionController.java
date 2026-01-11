@@ -27,7 +27,7 @@ public class QuestionActionController {
 
     @GetMapping("/{id}/solve")
     public String toggleSolved(@PathVariable Long id) {
-        questionService.toggleSolved(id);
+        questionService.incrementSolve(id);
         return QuestionViewConstants.REDIRECT_QUESTIONS;
     }
 

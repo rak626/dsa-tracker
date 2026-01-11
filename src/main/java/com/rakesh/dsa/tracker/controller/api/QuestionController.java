@@ -2,7 +2,7 @@ package com.rakesh.dsa.tracker.controller.api;
 
 import com.rakesh.dsa.tracker.model.Question;
 import com.rakesh.dsa.tracker.model.dto.CreateQuestionRequest;
-import com.rakesh.dsa.tracker.service.QuestionService;
+import com.rakesh.dsa.tracker.service.impl.QuestionServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class QuestionController {
 
-    private final QuestionService questionService;
+    private final QuestionServiceImpl questionService;
 
     @PostMapping
     public ResponseEntity<?> add(@RequestBody CreateQuestionRequest request) {

@@ -11,7 +11,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         CreateQuestionRequest request = new CreateQuestionRequest();
-        request.setSolved(true);
+        request.setSolveCount(1);
         request.setReviseCount(0);
 
         model.addAttribute("request", request);

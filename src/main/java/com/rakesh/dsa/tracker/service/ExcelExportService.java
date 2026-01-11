@@ -82,12 +82,12 @@ public class ExcelExportService {
                     q.getDifficulty() != null ? q.getDifficulty().name() : "",
                     diffStyle);
 
-            // Solved
+            // Solve Count
             createCell(
                     row,
                     4,
-                    q.isSolved() ? "Yes" : "No",
-                    q.isSolved() ? solvedStyle : unsolvedStyle
+                    String.valueOf(q.getSolveCount() == null ? 0 : q.getSolveCount()),
+                    bodyStyle
             );
 
             // Revise Count
