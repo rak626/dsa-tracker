@@ -52,9 +52,7 @@ public class QuestionService {
                 .problemLink(request.getProblemLink())
                 .platform(platform)
                 .difficulty(DifficultyType.valueOf(request.getDifficulty()))
-                .solved(request.getSolved())
-                .lastAttemptedAt(request.getSolved() != null && request.getSolved() ? Instant.now() : null)
-                .reviseCount(request.getReviseCount())
+                .lastAttemptedAt(Instant.now())
                 .topics(resolveTopics(request.getTopics()))
                 .patterns(resolvePatterns(request.getPatterns()))
                 .build();
@@ -151,18 +149,15 @@ public class QuestionService {
         return all.get(ThreadLocalRandom.current().nextInt(all.size())).getProblemLink();
     }
 
-    public Question toggleSolved(Long id) {
+    public Question incrementSolve(Long id) {
         Question q = questionRepository.findById(id).orElseThrow(() -> new RuntimeException("Question not found"));
-        q.setSolved(!q.isSolved());
-        if (q.isSolved()) {
-            q.setLastAttemptedAt(Instant.now());
-        }
+        q.setSolveCount((q.getSolveCount() == null ? 1 : q.getSolveCount()) + 1);
         return questionRepository.save(q);
     }
 
     public Question incrementRevise(Long id) {
         Question q = questionRepository.findById(id).orElseThrow();
-        q.setReviseCount((q.getReviseCount() == null ? 0 : q.getReviseCount()) + 1);
+        q.setReviseCount((q.getReviseCount() == null ? 1 : q.getReviseCount()) + 1);
         q.setLastAttemptedAt(Instant.now());
         return questionRepository.save(q);
     }
@@ -213,8 +208,9 @@ public class QuestionService {
             q.setPatterns(resolvePatterns(req.getPatterns()));
         }
 
-        if (req.getSolved() != null) {
-            q.setSolved(req.getSolved());
+        if (req.getSolveCount() != null) {
+            q.setSolveCount(req.getSolveCount());
+            q.setLastAttemptedAt(Instant.now());
         }
 
         return questionRepository.save(q);

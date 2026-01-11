@@ -19,7 +19,7 @@ public class CreateQuestionRequest {
     private Set<String> topics;
     private Set<String> patterns;
 
-    private Boolean solved;
+    private Integer solveCount;
 
     private Integer reviseCount;
 }

@@ -53,7 +53,8 @@ public class Question {
     )
     private List<Pattern> patterns = new ArrayList<>();
 
-    private boolean solved = true;
+    @Builder.Default
+    private Integer solveCount = 1;
 
     @Builder.Default
     private Integer reviseCount = 0;

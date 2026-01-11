@@ -16,7 +16,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/random" role="button">
+                    <a href="/questions/random" role="button">
                         Open Random Problem
                     </a>
                 </li>
@@ -68,6 +68,18 @@
                             <option value="HARD">HARD</option>
                         </select>
                     </label>
+                    <label>
+                        Solve Count
+                        <input type="number"
+                               th:field="*{solveCount}"
+                               min="1">
+                    </label>
+                    <label>
+                        Revise Count
+                        <input type="number"
+                               th:field="*{reviseCount}"
+                               min="0">
+                    </label>
                 </section>
 
                 <section class="grid">
@@ -89,26 +101,15 @@
                                                     'Two Pointers'
                                                 )}"/>
                 </section>
-
-
-                <section class="grid">
-                    <label>
-                        <input type="checkbox" th:field="*{solved}">
-                        Solved?
-                    </label>
-                    <label>
-                        Revise Count
-                        <input type="number"
-                               th:field="*{reviseCount}"
-                               min="0">
-                    </label>
-                </section>
-
             </fieldset>
 
             <!-- Actions -->
-            <section class="actions-single">
+            <section class="actions-single grid">
+                <div></div>
+                <div></div>
                 <button type="submit">Save</button>
+                <div></div>
+                <div></div>
             </section>
 
             <!-- Messages -->

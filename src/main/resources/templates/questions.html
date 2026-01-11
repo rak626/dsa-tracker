@@ -115,7 +115,7 @@
     <article>
 
         <figure>
-            <table role="grid">
+            <table class="striped">
                 <thead>
                 <tr>
                     <th>Video</th>
@@ -124,7 +124,7 @@
                     <th>Difficulty</th>
                     <th>Topics</th>
                     <th>Patterns</th>
-                    <th>Status</th>
+                    <th>Solve</th>
                     <th>Revise</th>
                     <th>Actions</th>
                 </tr>
@@ -155,9 +155,7 @@
                                th:text="${p} + ' '"></small>
                     </td>
 
-                    <td>
-                        <strong th:text="${q.solved} ? 'Solved' : 'Pending'"></strong>
-                    </td>
+                    <td th:text="${q.solveCount}"></td>
 
                     <td th:text="${q.reviseCount}"></td>
 
@@ -173,12 +171,6 @@
                         <a th:href="@{/questions/edit/{id}(id=${q.id})}">
                             Edit
                         </a>
-
-                        <form th:action="@{/questions/{id}/delete(id=${q.id})}" method="post">
-                            <button type="submit">Delete</button>
-                        </form>
-
-
                     </td>
                 </tr>
                 </tbody>
