@@ -2,8 +2,8 @@ package com.rakesh.dsa.tracker.utils;
 
 import java.net.URI;
 
-public class QuestionServiceUtil {
-    public static String detectPlatform(String url) {
+public interface QuestionServiceUtil {
+    static String detectPlatform(String url) {
         try {
             URI uri = new URI(url);
             String host = uri.getHost(); // e.g. "leetcode.com"
@@ -24,7 +24,7 @@ public class QuestionServiceUtil {
         }
     }
 
-    public static String detectProblemName(String url) {
+    static String detectProblemName(String url) {
         try {
             URI uri = new URI(url);
 

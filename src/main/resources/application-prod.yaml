@@ -20,3 +20,16 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+app:
+  name: dsa-tracker
+  backup:
+    enabled: true
+    cron: "0 0 0 * * *" # not functional right now
+    max-files: 20
+
+  github:
+    username: rak626
+    branch: main
+    token: ${GITHUB_BACKUP_TOKEN}
+    repo: dsa-tracker-backups

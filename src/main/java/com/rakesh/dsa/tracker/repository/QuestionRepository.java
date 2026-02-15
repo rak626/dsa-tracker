@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface QuestionRepository
         extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
+    boolean existsByProblemLink(String problemLink);
 }
