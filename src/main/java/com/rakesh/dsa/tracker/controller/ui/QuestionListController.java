@@ -20,7 +20,7 @@ public class QuestionListController {
     public String list(
             QuestionFilter questionFilter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
 
