@@ -1,0 +1,60 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: dsa-tracker-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: dsa_tracker
+      POSTGRES_USER: rakesh
+      POSTGRES_PASSWORD: rakesh123_admin
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    ports:
+      - "5433:5432"
+
+    networks:
+      - backend
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rakesh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  app:
+    image: dsa-tracker-app:latest
+    container_name: dsa-tracker-app
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      GITHUB_BACKUP_TOKEN: ${GITHUB_BACKUP_TOKEN}
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dsa_tracker
+      SPRING_DATASOURCE_USERNAME: rakesh
+      SPRING_DATASOURCE_PASSWORD: rakesh123_admin
+
+      SPRING_PROFILES_ACTIVE: prod
+
+    ports:
+      - "5050:5050"
+
+    networks:
+      - backend
+
+
+volumes:
+  postgres_data:
+
+
+networks:
+  backend:
+    driver: bridge
