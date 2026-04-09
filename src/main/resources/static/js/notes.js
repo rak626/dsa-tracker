@@ -79,3 +79,26 @@ document.addEventListener('click', function(e) {
         closeNotesModal();
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const approachEditor = document.getElementById('approachEditor');
+    const codeEditor = document.getElementById('codeEditor');
+    const approachPreview = document.getElementById('approachPreview');
+    const codePreview = document.getElementById('codePreview');
+    
+    if (approachEditor && approachPreview) {
+        const updateApproachPreview = () => {
+            approachPreview.innerHTML = marked.parse(approachEditor.value || '');
+        };
+        approachEditor.addEventListener('input', updateApproachPreview);
+        updateApproachPreview();
+    }
+    
+    if (codeEditor && codePreview) {
+        const updateCodePreview = () => {
+            codePreview.innerHTML = marked.parse(codeEditor.value || '');
+        };
+        codeEditor.addEventListener('input', updateCodePreview);
+        updateCodePreview();
+    }
+});
