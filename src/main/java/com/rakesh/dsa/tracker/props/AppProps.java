@@ -17,6 +17,7 @@ public class AppProps {
     private final Backup backup = new Backup();
     private final Database database = new Database();
     private final GitHub github = new GitHub();
+    private final Security security = new Security();
 
     @Data
     public static class Backup {
@@ -43,5 +44,11 @@ public class AppProps {
         private String token;
         private String remoteUrl;
         private String repo;
+    }
+
+    @Data
+    public static class Security {
+        private String adminUsername;
+        private String adminPassword;
     }
 }

@@ -1,18 +1,18 @@
 server:
-  port: 5050
+  port: 7008
 
 spring:
   application:
     name: dsa-tracker
   datasource:
-    url: jdbc:postgresql://postgres:5432/dsa_tracker
+    url: jdbc:postgresql://localhost:5432/dsa_tracker
     username: rakesh
     password: rakesh123_admin
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: false
@@ -32,8 +32,8 @@ app:
     branch: main
     token: ${GITHUB_BACKUP_TOKEN:}
   security:
-    admin-username: ${ADMIN_USERNAME:admin}
-    admin-password: ${ADMIN_PASSWORD:}
+    admin-username: admin
+    admin-password: admin123
 
 management:
   endpoints:
@@ -42,7 +42,7 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: always
     prometheus:
       enabled: true
 
@@ -51,14 +51,12 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
-    enabled: false
+    enabled: true
 
 logging:
   level:
-    com.rakesh.dsa.tracker: INFO
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
+    com.rakesh.dsa.tracker: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/dsa-tracker.log

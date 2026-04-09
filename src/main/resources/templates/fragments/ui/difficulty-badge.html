@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<th:block th:fragment="difficulty-badge(difficulty)">
+    <span class="badge" 
+          th:classappend="${difficulty == 'EASY' ? 'badge-easy' : (difficulty == 'MEDIUM' ? 'badge-medium' : 'badge-hard')}"
+          th:text="${difficulty}">
+    </span>
+</th:block>
+
+<th:block th:fragment="difficulty-select(selected, name)">
+    <select th:name="${name}" required>
+        <option value="">-- Select --</option>
+        <option value="EASY" th:selected="${selected == 'EASY'}">EASY</option>
+        <option value="MEDIUM" th:selected="${selected == 'MEDIUM'}">MEDIUM</option>
+        <option value="HARD" th:selected="${selected == 'HARD'}">HARD</option>
+    </select>
+</th:block>
+
+</body>
+</html>

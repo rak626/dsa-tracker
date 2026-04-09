@@ -1,130 +1,165 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout/base :: parent(_, _, _, ~{::content}, _)}">
+      th:replace="~{layout/base :: base('Add Question', 'home', ~{::content}, ~{::scripts})}">
 
-<section th:fragment="content" class="container page">
-
-    <!-- Page Header -->
-    <header>
-        <h2>DSA Tracker</h2>
-
-        <nav>
-            <ul>
-                <li>
-                    <a href="/questions" role="button" class="secondary">
-                        View All Questions
-                    </a>
-                </li>
-                <li>
-                    <a href="/questions/random" role="button">
-                        Open Random Problem
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Add Question Form -->
-    <article class="form-card">
-
-        <header>
-            <strong>Add Question</strong>
-        </header>
-        <!--        <p th:text="${request}"></p>-->
+<th:block th:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">Add New Question</h1>
+    </div>
+    
+    <div class="form-card">
+        <div class="form-card-header">
+            <h2>Question Details</h2>
+        </div>
+        
         <form th:action="@{/questions}" th:object="${request}" method="post">
-
             <fieldset>
-                <label>
-                    Problem Link *
-                    <input type="url"
-                           th:field="*{problemLink}"
-                           required>
-                </label>
-
-                <label>
-                    Problem Name
-                    <input type="text" th:field="*{problemName}">
-                </label>
-
-                <section class="grid">
-                    <label>
-                        Video ID
-                        <input type="text" th:field="*{videoId}">
-                    </label>
-
-                    <label>
-                        Platform
-                        <input type="text"
-                               th:field="*{platform}"
-                               placeholder="LEETCODE / GFG">
-                    </label>
-
-                    <label>
-                        Difficulty
-                        <select th:field="*{difficulty}" required>
-                            <option selected disabled value="">-- Select --</option>
-                            <option value="EASY">EASY</option>
-                            <option value="MEDIUM">MEDIUM</option>
-                            <option value="HARD">HARD</option>
-                        </select>
-                    </label>
-                    <label>
-                        Solve Count
-                        <input type="number"
-                               th:field="*{solveCount}"
-                               min="1">
-                    </label>
-                    <label>
-                        Revise Count
-                        <input type="number"
-                               th:field="*{reviseCount}"
-                               min="0">
-                    </label>
-                </section>
-
-                <section class="grid">
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label for="problemLink">
+                            Problem Link *
+                            <input type="url" 
+                                   id="problemLink" 
+                                   th:field="*{problemLink}" 
+                                   placeholder="https://leetcode.com/problems/..."
+                                   required>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="problemName">
+                            Problem Name
+                            <input type="text" 
+                                   id="problemName" 
+                                   th:field="*{problemName}" 
+                                   placeholder="Two Sum">
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="videoId">
+                            Video ID
+                            <input type="text" 
+                                   id="videoId" 
+                                   th:field="*{videoId}" 
+                                   placeholder="Optional">
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="platform">
+                            Platform
+                            <input type="text" 
+                                   id="platform" 
+                                   th:field="*{platform}" 
+                                   placeholder="LEETCODE / GFG">
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty">
+                            Difficulty
+                            <th:block th:replace="~{fragments/ui/difficulty-badge :: difficulty-select(${request?.difficulty}, 'difficulty')}"></th:block>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="solveCount">
+                            Solve Count
+                            <input type="number" 
+                                   id="solveCount" 
+                                   th:field="*{solveCount}" 
+                                   min="1"
+                                   value="1">
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reviseCount">
+                            Revise Count
+                            <input type="number" 
+                                   id="reviseCount" 
+                                   th:field="*{reviseCount}" 
+                                   min="0"
+                                   value="0">
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-tags">
                     <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                                                        'Topics (comma separated)',
-                                                        'topicsInput',
-                                                        null,
-                                                        '/api/suggestions/topics',
-                                                        true,
-                                                        'Array, Hash Table'
-                                                    )}"/>
-
+                        'Topics (comma separated)',
+                        'topicsInput',
+                        null,
+                        '/api/suggestions/topics',
+                        true,
+                        'Array, Hash Table'
+                    )}"></th:block>
+                    
                     <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                                                    'Patterns (comma separated)',
-                                                    'patternsInput',
-                                                    null,
-                                                    '/api/suggestions/patterns',
-                                                    true,
-                                                    'Two Pointers'
-                                                )}"/>
-                </section>
+                        'Patterns (comma separated)',
+                        'patternsInput',
+                        null,
+                        '/api/suggestions/patterns',
+                        true,
+                        'Two Pointers'
+                    )}"></th:block>
+                </div>
             </fieldset>
-
-            <!-- Actions -->
-            <section class="actions-single grid">
-                <div></div>
-                <div></div>
-                <button type="submit">Save</button>
-                <div></div>
-                <div></div>
-            </section>
-
-            <!-- Messages -->
-            <p th:if="${successMessage}" class="alert-success">
-                <strong>✔</strong>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Save Question
+                </button>
+                <a th:href="@{/questions}" class="btn btn-secondary">View All Questions</a>
+            </div>
+            
+            <div th:if="${successMessage}" class="alert alert-success">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
                 <span th:text="${successMessage}"></span>
-            </p>
-
-            <p th:if="${errorMessage}" class="alert-error">
-                <strong>✖</strong>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-error">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
                 <span th:text="${errorMessage}"></span>
-            </p>
-
+            </div>
         </form>
-    </article>
+    </div>
+</th:block>
 
-</section>
+<th:block th:fragment="scripts">
+    <script>
+        document.getElementById('problemLink').addEventListener('blur', function() {
+            const link = this.value;
+            if (link && !document.getElementById('problemName').value) {
+                try {
+                    const url = new URL(link);
+                    const parts = url.pathname.split('/').filter(Boolean);
+                    if (parts.length > 0) {
+                        const lastPart = parts[parts.length - 1];
+                        const name = lastPart.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        document.getElementById('problemName').value = name;
+                    }
+                    if (!document.getElementById('platform').value) {
+                        const host = url.hostname.replace('www.', '');
+                        document.getElementById('platform').value = host.toUpperCase();
+                    }
+                } catch (e) {}
+            }
+        });
+    </script>
+</th:block>
+
 </html>

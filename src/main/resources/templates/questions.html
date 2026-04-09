@@ -1,230 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout/base :: parent(~{::title}, _, _, ~{::content}, _)}">
+      th:replace="~{layout/base :: base('Questions', 'questions', ~{::content}, _)}">
 
-<title>All Questions</title>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">All Questions</h1>
+        <div class="page-actions">
+            <a th:href="@{/dashboard}" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                Dashboard
+            </a>
+            <a th:href="@{/api/ops/export/excel}" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export Excel
+            </a>
+        </div>
+    </div>
+    
+    <th:block th:replace="~{fragments/forms/filter-form :: filter-form('/questions')}"></th:block>
+    
+    <th:block th:replace="~{fragments/tables/question-table :: question-table(${questions})}"></th:block>
+    
+    <th:block th:replace="~{fragments/ui/pagination :: pagination(${page}, ${totalPages}, '/questions', 'size=' + ${size} + '&search=' + (${search} ?: '') + '&difficulty=' + (${difficulty} ?: '') + '&platform=' + (${platform} ?: '') + '&topic=' + (${topic} ?: '') + '&pattern=' + (${pattern} ?: '') + '&filterDate=' + (${filterDate} ?: ''))}"></th:block>
+    
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+</th:block>
 
-<section th:fragment="content" class="container page">
-
-    <!-- Page Header -->
-    <header>
-        <h2>All Questions</h2>
-
-        <nav>
-            <ul>
-                <li>
-                    <a href="/" role="button">Add New Question</a>
-                </li>
-                <li>
-                    <a href="/api/ops/export/excel" role="button" class="secondary">
-                        Export to Excel
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Alerts -->
-    <p th:if="${successMessage}"
-       class="alert-success"
-       th:text="${successMessage}">
-    </p>
-
-    <p th:if="${errorMessage}"
-       class="alert-error"
-       th:text="${errorMessage}">
-    </p>
-
-
-    <!-- Filters -->
-    <article class="filters">
-
-        <form method="get">
-
-            <!-- Inputs Grid -->
-            <div class="filters-grid">
-                <label>
-                    <input name="search"
-                           type="search"
-                           th:value="${search}"
-                           placeholder="Search Questions"
-                           aria-label="Search Questions"
-                    >
-                </label>
-
-                <label>
-                    <select name="difficulty">
-                        <option value="">Difficulty</option>
-                        <option value="EASY" th:selected="${difficulty == 'EASY'}">EASY</option>
-                        <option value="MEDIUM" th:selected="${difficulty == 'MEDIUM'}">MEDIUM</option>
-                        <option value="HARD" th:selected="${difficulty == 'HARD'}">HARD</option>
-                    </select>
-                </label>
-
-                <label>
-                    <input name="platform"
-                           th:value="${platform}"
-                           placeholder="Platform">
-                </label>
-
-                <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                                                        _,
-                                                        'topic',
-                                                        ${topic},
-                                                        '/api/suggestions/topics',
-                                                        false,
-                                                        'Topic'
-                                                    )}"/>
-
-                <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                                                    _,
-                                                    'pattern',
-                                                    ${pattern},
-                                                    '/api/suggestions/patterns',
-                                                    false,
-                                                    'Pattern'
-                                                )}"/>
-
-
-                <label>
-                    <select name="size" onchange="this.form.submit()">
-                        <option value="5" th:selected="${size == 5}">5</option>
-                        <option value="10" th:selected="${size == 10}">10</option>
-                        <option value="20" th:selected="${size == 20}">20</option>
-                        <option value="50" th:selected="${size == 50}">50</option>
-                    </select>
-                </label>
-            </div>
-
-            <!-- Actions -->
-            <div class="filter-button-group">
-                <button type="submit" class="filter-button">Filter</button>
-                <a th:href="@{/questions}" class="filter-link">
-                    Reset
-                </a>
-            </div>
-
-
-            <input type="hidden" name="page" value="0"/>
-
-        </form>
-    </article>
-
-
-    <!-- Table -->
-    <article>
-
-        <figure>
-            <table class="striped">
-                <thead>
-                <tr>
-                    <th>Video</th>
-                    <th>Problem</th>
-                    <th>Platform</th>
-                    <th>Difficulty</th>
-                    <th>Topics</th>
-                    <th>Patterns</th>
-                    <th>Solve</th>
-                    <th>Revise</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr th:each="q : ${questions}">
-
-                    <td th:text="${q.videoId}"></td>
-
-                    <td>
-                        <a th:href="${q.problemLink}"
-                           target="_blank"
-                           th:text="${q.problemName}">
-                        </a>
-                    </td>
-
-                    <td th:text="${q.platform}"></td>
-                    <td th:text="${q.difficultyLabel}"></td>
-
-                    <td>
-                        <small th:each="t : ${#strings.arraySplit(q.topicNames, ',')}"
-                               th:text="${t} + ' '"></small>
-                    </td>
-
-                    <td>
-                        <small th:each="p : ${#strings.arraySplit(q.patternNames, ',')}"
-                               th:text="${p} + ' '"></small>
-                    </td>
-
-                    <td th:text="${q.solveCount}"></td>
-
-                    <td th:text="${q.reviseCount}"></td>
-
-                    <td class="table-actions">
-                        <a th:href="@{/questions/{id}/solve(id=${q.id})}">
-                            Toggle
-                        </a>
-
-                        <a th:href="@{/questions/{id}/revise(id=${q.id})}">
-                            +Revise
-                        </a>
-
-                        <a th:href="@{/questions/edit/{id}(id=${q.id})}">
-                            Edit
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </figure>
-
-        <!-- Pagination -->
-        <nav th:if="${totalPages > 1}">
-            <ul>
-                <li th:if="${page > 0}">
-                    <a th:href="@{/questions(
-                        page=${page - 1},
-                        size=${size},
-                        search=${search},
-                        difficulty=${difficulty},
-                        platform=${platform},
-                        topic=${topic},
-                        pattern=${pattern}
-                    )}">
-                        Prev
-                    </a>
-                </li>
-
-                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                    <a th:href="@{/questions(
-                        page=${i},
-                        size=${size},
-                        search=${search},
-                        difficulty=${difficulty},
-                        platform=${platform},
-                        topic=${topic},
-                        pattern=${pattern}
-                    )}"
-                       th:text="${i + 1}">
-                    </a>
-                </li>
-
-                <li th:if="${page < totalPages - 1}">
-                    <a th:href="@{/questions(
-                        page=${page + 1},
-                        size=${size},
-                        search=${search},
-                        difficulty=${difficulty},
-                        platform=${platform},
-                        topic=${topic},
-                        pattern=${pattern}
-                    )}">
-                        Next
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-    </article>
-
-</section>
 </html>

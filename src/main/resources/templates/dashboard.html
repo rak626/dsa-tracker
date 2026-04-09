@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout/base :: base('Dashboard', 'dashboard', ~{::content}, ~{::scripts})}">
+
+<th:block th:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="page-actions">
+            <a th:href="@{/}" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Add Question
+            </a>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'Total Questions',
+            ${stats.totalQuestions},
+            'All time',
+            ~{fragments/cards/stat-card :: stat-card-icon('total')},
+            ''
+        )}"></th:block>
+        
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'Today',
+            ${stats.questionsToday},
+            'Solved today',
+            ~{fragments/cards/stat-card :: stat-card-icon('solved')},
+            'stat-card-solved'
+        )}"></th:block>
+        
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'This Week',
+            ${stats.questionsThisWeek},
+            'Solved this week',
+            ~{fragments/cards/stat-card :: stat-card-icon('solved')},
+            'stat-card-solved'
+        )}"></th:block>
+        
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'This Month',
+            ${stats.questionsThisMonth},
+            'Solved this month',
+            ~{fragments/cards/stat-card :: stat-card-icon('solved')},
+            'stat-card-solved'
+        )}"></th:block>
+    </div>
+    
+    <div class="stats-grid">
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'Easy',
+            ${stats.countByDifficulty.get('EASY')},
+            'Easy problems',
+            ~{fragments/cards/stat-card :: stat-card-icon('easy')},
+            'stat-card-easy'
+        )}"></th:block>
+        
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'Medium',
+            ${stats.countByDifficulty.get('MEDIUM')},
+            'Medium problems',
+            ~{fragments/cards/stat-card :: stat-card-icon('medium')},
+            'stat-card-medium'
+        )}"></th:block>
+        
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'Hard',
+            ${stats.countByDifficulty.get('HARD')},
+            'Hard problems',
+            ~{fragments/cards/stat-card :: stat-card-icon('hard')},
+            'stat-card-hard'
+        )}"></th:block>
+        
+        <th:block th:replace="~{fragments/cards/stat-card :: stat-card(
+            'Total Revisions',
+            ${stats.totalRevisions},
+            'Avg ' + ${#numbers.formatDecimal(stats.averageRevisions, 1, 1)} + ' per question',
+            ~{fragments/cards/stat-card :: stat-card-icon('revision')},
+            ''
+        )}"></th:block>
+    </div>
+    
+    <section class="dashboard-section">
+        <h2 class="section-title">Progress Charts</h2>
+        <div class="charts-grid">
+            <article class="chart-card">
+                <h3>Difficulty Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="difficultyChart"></canvas>
+                </div>
+            </article>
+            
+            <article class="chart-card">
+                <h3>Last 30 Days Trend</h3>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </article>
+        </div>
+    </section>
+    
+    <section class="dashboard-section">
+        <h2 class="section-title">Top Topics & Patterns</h2>
+        <div class="charts-grid">
+            <article class="chart-card">
+                <h3>Top Topics</h3>
+                <div class="chart-container">
+                    <canvas id="topicsChart"></canvas>
+                </div>
+            </article>
+            
+            <article class="chart-card">
+                <h3>Top Patterns</h3>
+                <div class="chart-container">
+                    <canvas id="patternsChart"></canvas>
+                </div>
+            </article>
+        </div>
+    </section>
+</th:block>
+
+<th:block th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+        const easyCount = [[${stats.countByDifficulty.get('EASY')}]] || 0;
+        const mediumCount = [[${stats.countByDifficulty.get('MEDIUM')}]] || 0;
+        const hardCount = [[${stats.countByDifficulty.get('HARD')}]] || 0;
+        
+        const difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
+        new Chart(difficultyCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Easy', 'Medium', 'Hard'],
+                datasets: [{
+                    data: [easyCount, mediumCount, hardCount],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                    hoverBackgroundColor: ['#34d399', '#fbbf24', '#f87171'],
+                    borderColor: '#1e1e2e',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            font: { family: 'Inter' }
+                        }
+                    }
+                }
+            }
+        });
+        
+        const dailyData = /*[[${stats.dailyTrend}]]*/ [];
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: dailyData.map(d => d.date),
+                datasets: [{
+                    label: 'Questions Solved',
+                    data: dailyData.map(d => d.count),
+                    borderColor: '#22d3ee',
+                    backgroundColor: 'rgba(34, 211, 238, 0.15)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#94a3b8', font: { family: 'Inter' } },
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            color: '#94a3b8',
+                            font: { family: 'Inter' }
+                        },
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                    }
+                }
+            }
+        });
+        
+        const topTopics = /*[[${stats.topTopics}]]*/ [];
+        const topicsCtx = document.getElementById('topicsChart').getContext('2d');
+        new Chart(topicsCtx, {
+            type: 'bar',
+            data: {
+                labels: topTopics.map(t => t.name),
+                datasets: [{
+                    label: 'Count',
+                    data: topTopics.map(t => t.count),
+                    backgroundColor: 'rgba(34, 211, 238, 0.3)',
+                    borderColor: '#22d3ee',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        
+        const topPatterns = /*[[${stats.topPatterns}]]*/ [];
+        const patternsCtx = document.getElementById('patternsChart').getContext('2d');
+        new Chart(patternsCtx, {
+            type: 'bar',
+            data: {
+                labels: topPatterns.map(p => p.name),
+                datasets: [{
+                    label: 'Count',
+                    data: topPatterns.map(p => p.count),
+                    backgroundColor: 'rgba(167, 139, 250, 0.3)',
+                    borderColor: '#a78bfa',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</th:block>
+
+</html>

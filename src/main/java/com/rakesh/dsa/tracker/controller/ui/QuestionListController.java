@@ -34,6 +34,12 @@ public class QuestionListController {
         model.addAttribute("totalPages", result.getTotalPages());
         model.addAttribute("page", page);
         model.addAttribute("size", size);
+        model.addAttribute("search", questionFilter.search());
+        model.addAttribute("difficulty", questionFilter.difficulty() != null ? questionFilter.difficulty().name() : null);
+        model.addAttribute("platform", normalize(questionFilter.platform()));
+        model.addAttribute("topic", questionFilter.topic());
+        model.addAttribute("pattern", questionFilter.pattern());
+        model.addAttribute("filterDate", questionFilter.filterDate());
 
         return QuestionViewConstants.QUESTIONS;
     }

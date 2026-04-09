@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<th:block th:fragment="pagination(page, totalPages, baseUrl, params)">
+    <nav class="pagination-nav" th:if="${totalPages > 1}">
+        <ul>
+            <li th:if="${page > 0}">
+                <a th:href="@{${baseUrl}(page=${page - 1}, ${params})}" class="pagination-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                    Prev
+                </a>
+            </li>
+            
+            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:if="${i >= page - 2 and i <= page + 2}">
+                <a th:href="@{${baseUrl}(page=${i}, ${params})}"
+                   class="pagination-link"
+                   th:classappend="${i == page} ? 'active' : ''"
+                   th:text="${i + 1}">
+                </a>
+            </li>
+            
+            <li th:if="${page < totalPages - 1}">
+                <a th:href="@{${baseUrl}(page=${page + 1}, ${params})}" class="pagination-link">
+                    Next
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <p class="pagination-info" th:if="${totalPages > 0}">
+        Page <span th:text="${page + 1}"></span> of <span th:text="${totalPages}"></span>
+    </p>
+</th:block>
+
+</body>
+</html>

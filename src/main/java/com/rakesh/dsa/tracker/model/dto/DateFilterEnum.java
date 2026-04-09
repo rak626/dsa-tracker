@@ -69,7 +69,7 @@ public enum DateFilterEnum {
     ALL_TIME {
         @Override
         public Instant cutoff(Clock clock) {
-            return null;
+            return Instant.MIN;
         }
     };
 

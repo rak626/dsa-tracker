@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<th:block th:fragment="stat-card(title, value, subtitle, icon, colorClass)">
+    <article class="stat-card" th:classappend="${colorClass}">
+        <div class="stat-icon">
+            <th:block th:replace="${icon}"></th:block>
+        </div>
+        <div class="stat-content">
+            <p class="stat-label" th:text="${title}">Label</p>
+            <p class="stat-value" th:text="${value}">0</p>
+            <p class="stat-subtitle" th:text="${subtitle}" th:if="${subtitle}">Subtitle</p>
+        </div>
+    </article>
+</th:block>
+
+<th:block th:fragment="stat-card-icon(name)">
+    <th:block th:switch="${name}">
+        <th:block th:case="'total'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+            </svg>
+        </th:block>
+        <th:block th:case="'easy'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+        </th:block>
+        <th:block th:case="'medium'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="8" y1="15" x2="16" y2="15"/>
+                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+        </th:block>
+        <th:block th:case="'hard'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
+                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+        </th:block>
+        <th:block th:case="'solved'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </th:block>
+        <th:block th:case="'revision'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+        </th:block>
+        <th:block th:case="*">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            </svg>
+        </th:block>
+    </th:block>
+</th:block>
+
+</body>
+</html>

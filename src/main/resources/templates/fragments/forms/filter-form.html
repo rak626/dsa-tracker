@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.themleaf.org" lang="en">
+<body>
+
+<th:block th:fragment="filter-form(baseUrl)">
+    <div class="filter-card">
+        <form th:action="${baseUrl}" method="get" class="filter-form">
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <input type="search" 
+                           name="search" 
+                           th:value="${search}" 
+                           placeholder="Search..."
+                           class="filter-input">
+                </div>
+                
+                <div class="filter-item">
+                    <select name="difficulty" class="filter-input">
+                        <option value="">Difficulty</option>
+                        <option value="EASY" th:selected="${difficulty == 'EASY'}">EASY</option>
+                        <option value="MEDIUM" th:selected="${difficulty == 'MEDIUM'}">MEDIUM</option>
+                        <option value="HARD" th:selected="${difficulty == 'HARD'}">HARD</option>
+                    </select>
+                </div>
+                
+                <div class="filter-item">
+                    <input type="text" 
+                           name="platform" 
+                           th:value="${platform}" 
+                           placeholder="Platform"
+                           class="filter-input">
+                </div>
+                
+                <div class="filter-item">
+                    <input type="text" 
+                           name="topic" 
+                           th:value="${topic}"
+                           placeholder="Topic"
+                           class="filter-input autosuggest"
+                           data-endpoint="/api/suggestions/topics"
+                           data-multi="false">
+                </div>
+                
+                <div class="filter-item">
+                    <input type="text" 
+                           name="pattern" 
+                           th:value="${pattern}"
+                           placeholder="Pattern"
+                           class="filter-input autosuggest"
+                           data-endpoint="/api/suggestions/patterns"
+                           data-multi="false">
+                </div>
+                
+                <div class="filter-item">
+                    <select name="filterDate" class="filter-input">
+                        <option value="">Time Period</option>
+                        <option value="TODAY" th:selected="${filterDate == 'TODAY'}">Today</option>
+                        <option value="THIS_WEEK" th:selected="${filterDate == 'THIS_WEEK'}">This Week</option>
+                        <option value="THIS_MONTH" th:selected="${filterDate == 'THIS_MONTH'}">This Month</option>
+                        <option value="THIS_YEAR" th:selected="${filterDate == 'THIS_YEAR'}">This Year</option>
+                        <option value="ALL_TIME" th:selected="${filterDate == 'ALL_TIME'}">All Time</option>
+                    </select>
+                </div>
+                
+                <div class="filter-item">
+                    <select name="size" onchange="this.form.submit()" class="filter-input">
+                        <option value="10" th:selected="${size == 10}">10</option>
+                        <option value="20" th:selected="${size == 20}">20</option>
+                        <option value="50" th:selected="${size == 50}">50</option>
+                        <option value="100" th:selected="${size == 100}">100</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                    </svg>
+                    Filter
+                </button>
+                <a th:href="@{${baseUrl}}" class="btn-reset">Reset</a>
+            </div>
+            
+            <input type="hidden" name="page" value="0">
+        </form>
+    </div>
+</th:block>
+
+</body>
+</html>

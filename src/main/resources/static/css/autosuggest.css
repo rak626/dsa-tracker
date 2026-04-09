@@ -1,7 +1,7 @@
 .suggest-list {
     position: absolute;
-    background: var(--pico-background-color);
-    border: 1px solid var(--pico-muted-border-color);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     margin-top: 4px;
     padding: 0;
@@ -9,18 +9,20 @@
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
+    width: 100%;
 }
 
 .suggest-item {
     padding: 0.5rem;
     cursor: pointer;
+    color: var(--text-primary);
 }
 
 .suggest-item:hover {
-    background-color: var(--pico-muted-color);
+    background-color: var(--bg-tertiary);
 }
 
 .suggest-item.active {
-    background-color: var(--pico-primary-background);
-    color: var(--pico-primary-inverse);
+    background-color: rgba(0, 245, 255, 0.15);
+    color: var(--neon-cyan);
 }
