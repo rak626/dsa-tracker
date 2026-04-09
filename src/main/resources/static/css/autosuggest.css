@@ -16,6 +16,7 @@
     padding: 0.5rem;
     cursor: pointer;
     color: var(--text-primary);
+    transition: background-color 0.15s;
 }
 
 .suggest-item:hover {
@@ -23,6 +24,6 @@
 }
 
 .suggest-item.active {
-    background-color: rgba(0, 245, 255, 0.15);
-    color: var(--neon-cyan);
+    background-color: rgba(86, 182, 194, 0.2);
+    color: var(--accent-primary);
 }
