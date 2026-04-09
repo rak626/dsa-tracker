@@ -28,50 +28,55 @@
     <form th:action="@{/questions/{id}(id=${question.id})}"
           th:object="${question}"
           method="post"
-          th:id="updateForm">
+          th:id="updateForm"
+          autocomplete="off">
         
         <div class="edit-section-card">
             <div class="form-grid">
-                <div class="form-group form-group-full">
-                    <label for="problemLink">
-                        Problem Link *
-                        <input type="url" 
-                               id="problemLink" 
-                               th:field="*{problemLink}" 
-                               placeholder="https://leetcode.com/problems/..."
-                               required>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="problemName">
-                        Problem Name
-                        <input type="text" 
-                               id="problemName" 
-                               th:field="*{problemName}" 
-                               placeholder="Two Sum">
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="videoId">
-                        Video ID
-                        <input type="text" 
-                               id="videoId" 
-                               th:field="*{videoId}" 
-                               placeholder="Optional">
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="platform">
-                        Platform
-                        <input type="text" 
-                               id="platform" 
-                               th:field="*{platform}" 
-                               placeholder="LEETCODE / GFG">
-                    </label>
-                </div>
+                        <div class="form-group form-group-full">
+                            <label for="problemLink">
+                                Problem Link *
+                                <input type="url" 
+                                       id="problemLink" 
+                                       th:field="*{problemLink}" 
+                                       placeholder="https://leetcode.com/problems/..."
+                                       autocomplete="off"
+                                       required>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="problemName">
+                                Problem Name
+                                <input type="text" 
+                                       id="problemName" 
+                                       th:field="*{problemName}" 
+                                       placeholder="Two Sum"
+                                       autocomplete="off">
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="videoId">
+                                Video ID
+                                <input type="text" 
+                                       id="videoId" 
+                                       th:field="*{videoId}" 
+                                       placeholder="Optional"
+                                       autocomplete="off">
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="platform">
+                                Platform
+                                <input type="text" 
+                                       id="platform" 
+                                       th:field="*{platform}" 
+                                       placeholder="LEETCODE / GFG"
+                                       autocomplete="off">
+                            </label>
+                        </div>
                 
                 <div class="form-group">
                     <label for="difficulty">

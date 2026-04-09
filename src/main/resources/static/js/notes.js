@@ -101,4 +101,86 @@ document.addEventListener('DOMContentLoaded', function() {
         codeEditor.addEventListener('input', updateCodePreview);
         updateCodePreview();
     }
+    
+    if (window.successMessage) {
+        showToast(window.successMessage, 'success');
+        window.successMessage = null;
+    }
+    
+    if (window.errorMessage) {
+        showToast(window.errorMessage, 'error');
+        window.errorMessage = null;
+    }
 });
+
+function copyToClipboard(text, element) {
+    navigator.clipboard.writeText(text).then(() => {
+        if (element) {
+            element.classList.add('copied');
+            const originalHtml = element.innerHTML;
+            element.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+            setTimeout(() => {
+                element.classList.remove('copied');
+                element.innerHTML = originalHtml;
+            }, 2000);
+        }
+        showToast('Copied to clipboard!', 'success');
+    }).catch(() => {
+        showToast('Failed to copy', 'error');
+    });
+}
+
+function copyApproach() {
+    const text = document.getElementById('approachCode').textContent;
+    const btn = document.querySelector('[data-copy="approach"]');
+    copyToClipboard(text, btn);
+}
+
+function copyCode() {
+    const text = document.getElementById('codeBlock').textContent;
+    const btn = document.querySelector('[data-copy="code"]');
+    copyToClipboard(text, btn);
+}
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    const icon = type === 'success' 
+        ? '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    
+    toast.innerHTML = `
+        ${icon}
+        <span class="toast-message">${message}</span>
+        <button type="button" class="toast-close" onclick="hideToast(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        if (toast.parentNode) {
+            hideToast(toast.querySelector('.toast-close'));
+        }
+    }, 4000);
+}
+
+function hideToast(button) {
+    const toast = button.closest('.toast');
+    if (toast) {
+        toast.classList.add('toast-exit');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }
+}

@@ -21,50 +21,55 @@
     <form th:action="@{/questions}" 
           th:object="${request}" 
           method="post"
-          id="addQuestionForm">
+          id="addQuestionForm"
+          autocomplete="off">
         
         <div class="add-section-card">
             <div class="form-grid">
-                <div class="form-group form-group-full">
-                    <label for="problemLink">
-                        Problem Link *
-                        <input type="url" 
-                               id="problemLink" 
-                               th:field="*{problemLink}" 
-                               placeholder="https://leetcode.com/problems/..."
-                               required>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="problemName">
-                        Problem Name
-                        <input type="text" 
-                               id="problemName" 
-                               th:field="*{problemName}" 
-                               placeholder="Two Sum">
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="videoId">
-                        Video ID
-                        <input type="text" 
-                               id="videoId" 
-                               th:field="*{videoId}" 
-                               placeholder="Optional">
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="platform">
-                        Platform
-                        <input type="text" 
-                               id="platform" 
-                               th:field="*{platform}" 
-                               placeholder="LEETCODE / GFG">
-                    </label>
-                </div>
+                        <div class="form-group form-group-full">
+                            <label for="problemLink">
+                                Problem Link *
+                                <input type="url" 
+                                       id="problemLink" 
+                                       th:field="*{problemLink}" 
+                                       placeholder="https://leetcode.com/problems/..."
+                                       autocomplete="off"
+                                       required>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="problemName">
+                                Problem Name
+                                <input type="text" 
+                                       id="problemName" 
+                                       th:field="*{problemName}" 
+                                       placeholder="Two Sum"
+                                       autocomplete="off">
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="videoId">
+                                Video ID
+                                <input type="text" 
+                                       id="videoId" 
+                                       th:field="*{videoId}" 
+                                       placeholder="Optional"
+                                       autocomplete="off">
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="platform">
+                                Platform
+                                <input type="text" 
+                                       id="platform" 
+                                       th:field="*{platform}" 
+                                       placeholder="LEETCODE / GFG"
+                                       autocomplete="off">
+                            </label>
+                        </div>
                 
                 <div class="form-group">
                     <label for="difficulty">
@@ -181,27 +186,11 @@
             </div>
         </div>
     </form>
-    
-    <div th:if="${successMessage}" class="alert alert-success">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-        </svg>
-        <span th:text="${successMessage}"></span>
-    </div>
-    
-    <div th:if="${errorMessage}" class="alert alert-error">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span th:text="${errorMessage}"></span>
-    </div>
 </th:block>
 
 <th:block th:fragment="scripts">
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
         document.getElementById('problemLink').addEventListener('blur', function() {
             const link = this.value;
             if (link && !document.getElementById('problemName').value) {
@@ -220,6 +209,17 @@
                 } catch (e) {}
             }
         });
+        
+        /*[# th:if="${successMessage != null}"]*/
+        var successMsg = /*[[${successMessage}]]*/ null;
+        if (successMsg) showToast(successMsg, 'success');
+        /*[/]*/
+        
+        /*[# th:if="${errorMessage != null}"]*/
+        var errorMsg = /*[[${errorMessage}]]*/ null;
+        if (errorMsg) showToast(errorMsg, 'error');
+        /*[/]*/
+        /*]]>*/
     </script>
 </th:block>
 

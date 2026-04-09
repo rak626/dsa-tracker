@@ -40,11 +40,22 @@
     
     <th:block th:replace="~{fragments/ui/pagination :: pagination(${page}, ${totalPages}, '/questions', 'size=' + ${size} + '&search=' + (${search} ?: '') + '&difficulty=' + (${difficulty} ?: '') + '&platform=' + (${platform} ?: '') + '&topic=' + (${topic} ?: '') + '&pattern=' + (${pattern} ?: '') + '&filterDate=' + (${filterDate} ?: ''))}"></th:block>
     
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
-    
     <th:block th:replace="~{fragments/ui/upload-modal :: upload-modal}"></th:block>
     <th:block th:replace="~{fragments/ui/notes-modal :: notes-modal}"></th:block>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        /*[# th:if="${successMessage != null}"]*/
+        var successMsg = /*[[${successMessage}]]*/ null;
+        if (successMsg) showToast(successMsg, 'success');
+        /*[/]*/
+        
+        /*[# th:if="${errorMessage != null}"]*/
+        var errorMsg = /*[[${errorMessage}]]*/ null;
+        if (errorMsg) showToast(errorMsg, 'error');
+        /*[/]*/
+        /*]]>*/
+    </script>
 </th:block>
 
 </html>
