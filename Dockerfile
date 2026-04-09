@@ -1,32 +1,32 @@
 # ---------- Build Stage ----------
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
-# Copy only pom.xml first (for layer caching)
 COPY pom.xml .
 
-# Download dependencies
-RUN mvn dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn dependency:go-offline -B
 
-# Copy source code
 COPY src ./src
 
-# Build jar (skip tests if you want)
-RUN mvn clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn clean package -DskipTests -B
 
 
 # ---------- Runtime Stage ----------
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy jar from build stage
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 COPY --from=build /app/target/*.jar app.jar
 
-# Copy your Spring config
-COPY src/main/resources/application-prod.yaml /app/application.yaml
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 EXPOSE 5050
 
-ENTRYPOINT ["java","-jar","/app/app.jar","--spring.config.location=file:/app/application.yaml"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar", "--spring.profiles.active=prod"]

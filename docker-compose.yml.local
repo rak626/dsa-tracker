@@ -36,13 +36,12 @@ services:
         condition: service_healthy
 
     environment:
-      GITHUB_BACKUP_TOKEN: ${GITHUB_BACKUP_TOKEN}
-
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dsa_tracker
-      SPRING_DATASOURCE_USERNAME: rakesh
-      SPRING_DATASOURCE_PASSWORD: rakesh123_admin
-
-      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/dsa_tracker
+      DB_USERNAME: rakesh
+      DB_PASSWORD: rakesh123_admin
+      GITHUB_TOKEN: ${GITHUB_TOKEN:}
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:}
 
     ports:
       - "5050:5050"
