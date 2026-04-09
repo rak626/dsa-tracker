@@ -5,7 +5,7 @@
 <th:block th:fragment="footer">
     <footer class="app-footer">
         <div class="footer-content">
-            <p>DSA Tracker &copy; 2024</p>
+            <p>DSA Tracker &copy; <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span></p>
         </div>
     </footer>
 </th:block>

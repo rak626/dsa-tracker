@@ -32,7 +32,7 @@
                             </a>
                         </td>
                         <td>
-                            <span class="platform-badge" th:text="${q.platform}"></span>
+                            <th:block th:replace="~{fragments/ui/platform-icon :: platform-icon(${q.platform})}"></th:block>
                         </td>
                         <td>
                             <th:block th:replace="~{fragments/ui/difficulty-badge :: difficulty-badge(${q.difficulty})}"></th:block>
