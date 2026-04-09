@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
@@ -113,13 +114,16 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public Question incrementSolve(Long id) {
         Question q = questionRepository.findById(id).orElseThrow(() -> new RuntimeException("Question not found"));
         q.setSolveCount((q.getSolveCount() == null ? 1 : q.getSolveCount()) + 1);
+        q.setLastAttemptedAt(Instant.now());
         return questionRepository.save(q);
     }
 
     @Override
+    @Transactional
     public Question incrementRevise(Long id) {
         Question q = questionRepository.findById(id).orElseThrow();
         q.setReviseCount((q.getReviseCount() == null ? 1 : q.getReviseCount()) + 1);

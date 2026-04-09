@@ -9,9 +9,9 @@
     
     --neon-cyan: #00f5ff;
     --neon-purple: #bf00ff;
-    --neon-green: #00ff88;
-    --neon-pink: #ff006e;
-    --neon-yellow: #ffdd00;
+    --neon-green: #22c55e;
+    --neon-yellow: #eab308;
+    --neon-red: #ef4444;
     --neon-orange: #ff9500;
     
     --text-primary: #ffffff;
@@ -286,18 +286,18 @@ input, select, textarea {
 }
 
 .stat-icon.easy {
-    background: rgba(0, 255, 136, 0.1);
-    color: var(--neon-green);
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
 }
 
 .stat-icon.medium {
-    background: rgba(255, 221, 0, 0.1);
-    color: var(--neon-yellow);
+    background: rgba(234, 179, 8, 0.1);
+    color: #eab308;
 }
 
 .stat-icon.hard {
-    background: rgba(255, 0, 110, 0.1);
-    color: var(--neon-pink);
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
 .stat-icon.solved {
@@ -502,21 +502,21 @@ input, select, textarea {
 }
 
 .badge-easy {
-    background: rgba(0, 255, 136, 0.15);
-    color: var(--neon-green);
-    border: 1px solid rgba(0, 255, 136, 0.3);
+    background: rgba(34, 197, 94, 0.15) !important;
+    color: #22c55e !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
 }
 
 .badge-medium {
-    background: rgba(255, 221, 0, 0.15);
-    color: var(--neon-yellow);
-    border: 1px solid rgba(255, 221, 0, 0.3);
+    background: rgba(234, 179, 8, 0.15) !important;
+    color: #eab308 !important;
+    border: 1px solid rgba(234, 179, 8, 0.3) !important;
 }
 
 .badge-hard {
-    background: rgba(255, 0, 110, 0.15);
-    color: var(--neon-pink);
-    border: 1px solid rgba(255, 0, 110, 0.3);
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
 }
 
 .tags-cell {
@@ -588,7 +588,7 @@ input, select, textarea {
 .action-toggle:hover {
     background: var(--neon-green);
     color: #000;
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
 }
 
 .action-revise {
@@ -844,6 +844,7 @@ input, select, textarea {
 .chart-container {
     height: 280px;
     position: relative;
+    background: transparent;
 }
 
 .login-container {
