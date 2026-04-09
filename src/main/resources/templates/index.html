@@ -5,137 +5,198 @@
 <th:block th:fragment="content">
     <div class="page-header">
         <h1 class="page-title">Add New Question</h1>
+        <div class="page-header-actions">
+            <button type="submit" form="addQuestionForm" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                    <polyline points="17 21 17 13 7 13 7 21"/>
+                    <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Save Question
+            </button>
+            <a th:href="@{/questions}" class="btn btn-secondary">View All</a>
+        </div>
     </div>
     
-    <div class="form-card">
-        <div class="form-card-header">
-            <h2>Question Details</h2>
+    <form th:action="@{/questions}" 
+          th:object="${request}" 
+          method="post"
+          id="addQuestionForm">
+        
+        <div class="add-section-card">
+            <div class="form-grid">
+                <div class="form-group form-group-full">
+                    <label for="problemLink">
+                        Problem Link *
+                        <input type="url" 
+                               id="problemLink" 
+                               th:field="*{problemLink}" 
+                               placeholder="https://leetcode.com/problems/..."
+                               required>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="problemName">
+                        Problem Name
+                        <input type="text" 
+                               id="problemName" 
+                               th:field="*{problemName}" 
+                               placeholder="Two Sum">
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="videoId">
+                        Video ID
+                        <input type="text" 
+                               id="videoId" 
+                               th:field="*{videoId}" 
+                               placeholder="Optional">
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="platform">
+                        Platform
+                        <input type="text" 
+                               id="platform" 
+                               th:field="*{platform}" 
+                               placeholder="LEETCODE / GFG">
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="difficulty">
+                        Difficulty
+                        <th:block th:replace="~{fragments/ui/difficulty-badge :: difficulty-select(${request?.difficulty}, 'difficulty')}"></th:block>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="solveCount">
+                        Solve Count
+                        <input type="number" 
+                               id="solveCount" 
+                               th:field="*{solveCount}" 
+                               min="1"
+                               value="1">
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reviseCount">
+                        Revise Count
+                        <input type="number" 
+                               id="reviseCount" 
+                               th:field="*{reviseCount}" 
+                               min="0"
+                               value="0">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-tags">
+                <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                    'Topics (comma separated)',
+                    'topicsInput',
+                    null,
+                    '/api/suggestions/topics',
+                    true,
+                    'Array, Hash Table'
+                )}"></th:block>
+                
+                <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                    'Patterns (comma separated)',
+                    'patternsInput',
+                    null,
+                    '/api/suggestions/patterns',
+                    true,
+                    'Two Pointers'
+                )}"></th:block>
+            </div>
         </div>
         
-        <form th:action="@{/questions}" th:object="${request}" method="post">
-            <fieldset>
-                <div class="form-grid">
-                    <div class="form-group form-group-full">
-                        <label for="problemLink">
-                            Problem Link *
-                            <input type="url" 
-                                   id="problemLink" 
-                                   th:field="*{problemLink}" 
-                                   placeholder="https://leetcode.com/problems/..."
-                                   required>
-                        </label>
+        <div class="notes-section-card">
+            <div class="notes-split-view">
+                <div class="note-preview-pane">
+                    <div class="note-preview-section">
+                        <div class="note-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                            Approach Preview
+                        </div>
+                        <div class="note-preview-content" id="approachPreview"></div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="problemName">
-                            Problem Name
-                            <input type="text" 
-                                   id="problemName" 
-                                   th:field="*{problemName}" 
-                                   placeholder="Two Sum">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="videoId">
-                            Video ID
-                            <input type="text" 
-                                   id="videoId" 
-                                   th:field="*{videoId}" 
-                                   placeholder="Optional">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="platform">
-                            Platform
-                            <input type="text" 
-                                   id="platform" 
-                                   th:field="*{platform}" 
-                                   placeholder="LEETCODE / GFG">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="difficulty">
-                            Difficulty
-                            <th:block th:replace="~{fragments/ui/difficulty-badge :: difficulty-select(${request?.difficulty}, 'difficulty')}"></th:block>
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="solveCount">
-                            Solve Count
-                            <input type="number" 
-                                   id="solveCount" 
-                                   th:field="*{solveCount}" 
-                                   min="1"
-                                   value="1">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="reviseCount">
-                            Revise Count
-                            <input type="number" 
-                                   id="reviseCount" 
-                                   th:field="*{reviseCount}" 
-                                   min="0"
-                                   value="0">
-                        </label>
+                    <div class="note-preview-section">
+                        <div class="note-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                            Code Preview
+                        </div>
+                        <div class="note-preview-content code-preview" id="codePreview"></div>
                     </div>
                 </div>
                 
-                <div class="form-tags">
-                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                        'Topics (comma separated)',
-                        'topicsInput',
-                        null,
-                        '/api/suggestions/topics',
-                        true,
-                        'Array, Hash Table'
-                    )}"></th:block>
+                <div class="note-edit-pane">
+                    <div class="note-editor-card">
+                        <div class="note-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                            Approach
+                        </div>
+                        <textarea id="approachEditor" 
+                                  name="approach"
+                                  class="markdown-editor" 
+                                  th:text="${request?.approach}"
+                                  placeholder="# Approach&#10;Describe your approach here...&#10;&#10;## Complexity&#10;- Time: O(n)&#10;- Space: O(n)"
+                                  rows="8"></textarea>
+                    </div>
                     
-                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                        'Patterns (comma separated)',
-                        'patternsInput',
-                        null,
-                        '/api/suggestions/patterns',
-                        true,
-                        'Two Pointers'
-                    )}"></th:block>
+                    <div class="note-editor-card">
+                        <div class="note-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                            Code
+                        </div>
+                        <textarea id="codeEditor" 
+                                  name="code"
+                                  class="markdown-editor code-editor" 
+                                  th:text="${request?.code}"
+                                  placeholder="```java&#10;class Solution {&#10;    // your code here&#10;}&#10;```"
+                                  rows="10"></textarea>
+                    </div>
                 </div>
-            </fieldset>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                        <polyline points="17 21 17 13 7 13 7 21"/>
-                        <polyline points="7 3 7 8 15 8"/>
-                    </svg>
-                    Save Question
-                </button>
-                <a th:href="@{/questions}" class="btn btn-secondary">View All Questions</a>
             </div>
-            
-            <div th:if="${successMessage}" class="alert alert-success">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                <span th:text="${successMessage}"></span>
-            </div>
-            
-            <div th:if="${errorMessage}" class="alert alert-error">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <span th:text="${errorMessage}"></span>
-            </div>
-        </form>
+        </div>
+    </form>
+    
+    <div th:if="${successMessage}" class="alert alert-success">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span th:text="${successMessage}"></span>
+    </div>
+    
+    <div th:if="${errorMessage}" class="alert alert-error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span th:text="${errorMessage}"></span>
     </div>
 </th:block>
 

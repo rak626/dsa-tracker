@@ -1454,6 +1454,7 @@ input.filter-input[type="search"]::-webkit-search-cancel-button {
     align-items: center;
 }
 
+.add-section-card,
 .edit-section-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
