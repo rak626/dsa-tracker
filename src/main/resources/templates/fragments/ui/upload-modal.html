@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<th:block th:fragment="upload-modal">
+    <div id="uploadModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Import JSON</h3>
+                <button type="button" class="modal-close" onclick="closeUploadModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="uploadStep" class="upload-step">
+                    <div class="file-upload-area" id="dropZone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <p>Drag & drop your JSON file here</p>
+                        <span>or</span>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('jsonFileInput').click()">
+                            Browse Files
+                        </button>
+                        <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                    </div>
+                    <p id="fileName" class="file-name"></p>
+                </div>
+                
+                <div id="previewStep" class="preview-step" style="display: none;">
+                    <div class="preview-stats">
+                        <div class="preview-stat">
+                            <span class="preview-stat-value" id="statTotal">0</span>
+                            <span class="preview-stat-label">Total in File</span>
+                        </div>
+                        <div class="preview-stat preview-stat-new">
+                            <span class="preview-stat-value" id="statNew">0</span>
+                            <span class="preview-stat-label">New Questions</span>
+                        </div>
+                        <div class="preview-stat preview-stat-dup">
+                            <span class="preview-stat-value" id="statDup">0</span>
+                            <span class="preview-stat-label">Duplicates</span>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-details">
+                        <div class="preview-section" id="newTopicsSection" style="display: none;">
+                            <h4>New Topics to Create</h4>
+                            <div class="preview-tags" id="newTopicsList"></div>
+                        </div>
+                        <div class="preview-section" id="newPatternsSection" style="display: none;">
+                            <h4>New Patterns to Create</h4>
+                            <div class="preview-tags" id="newPatternsList"></div>
+                        </div>
+                        <div class="preview-section" id="newQuestionsSection">
+                            <h4>Questions to Import</h4>
+                            <div class="preview-list" id="newQuestionsList"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="loadingState" class="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Processing...</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" id="previewBtn" onclick="previewImport()" disabled>
+                    Preview Import
+                </button>
+                <button type="button" class="btn btn-primary" id="importBtn" onclick="confirmImport()" style="display: none;">
+                    Import Questions
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedFile = null;
+        
+        document.getElementById('jsonFileInput').addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                selectedFile = this.files[0];
+                document.getElementById('fileName').textContent = selectedFile.name;
+                document.getElementById('previewBtn').disabled = false;
+            }
+        });
+        
+        const dropZone = document.getElementById('dropZone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    selectedFile = e.dataTransfer.files[0];
+                    if (selectedFile.name.endsWith('.json')) {
+                        document.getElementById('fileName').textContent = selectedFile.name;
+                        document.getElementById('previewBtn').disabled = false;
+                    }
+                }
+            });
+        }
+        
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            resetModal();
+        }
+        
+        function resetModal() {
+            selectedFile = null;
+            document.getElementById('jsonFileInput').value = '';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('previewBtn').disabled = true;
+            document.getElementById('importBtn').style.display = 'none';
+            document.getElementById('previewBtn').style.display = '';
+            document.getElementById('uploadStep').style.display = '';
+            document.getElementById('previewStep').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'none';
+        }
+        
+        async function previewImport() {
+            if (!selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            document.getElementById('uploadStep').style.display = 'none';
+            document.getElementById('previewStep').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'flex';
+            
+            try {
+                const response = await fetch('/api/ops/import/json/preview', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Preview failed');
+                
+                const preview = await response.json();
+                displayPreview(preview);
+                
+            } catch (error) {
+                alert('Failed to preview: ' + error.message);
+                document.getElementById('uploadStep').style.display = '';
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+        
+        function displayPreview(preview) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('previewStep').style.display = 'block';
+            document.getElementById('previewBtn').style.display = 'none';
+            document.getElementById('importBtn').style.display = '';
+            
+            document.getElementById('statTotal').textContent = preview.totalQuestions;
+            document.getElementById('statNew').textContent = preview.newQuestions;
+            document.getElementById('statDup').textContent = preview.duplicateQuestions;
+            
+            const topicsSection = document.getElementById('newTopicsSection');
+            const topicsList = document.getElementById('newTopicsList');
+            if (preview.newTopics > 0) {
+                topicsSection.style.display = 'block';
+                topicsList.innerHTML = '';
+                Object.values(preview.newTopicNames).forEach(name => {
+                    topicsList.innerHTML += '<span class="tag tag-topic">' + name + '</span>';
+                });
+            } else {
+                topicsSection.style.display = 'none';
+            }
+            
+            const patternsSection = document.getElementById('newPatternsSection');
+            const patternsList = document.getElementById('newPatternsList');
+            if (preview.newPatterns > 0) {
+                patternsSection.style.display = 'block';
+                patternsList.innerHTML = '';
+                Object.values(preview.newPatternNames).forEach(name => {
+                    patternsList.innerHTML += '<span class="tag tag-pattern">' + name + '</span>';
+                });
+            } else {
+                patternsSection.style.display = 'none';
+            }
+            
+            const questionsList = document.getElementById('newQuestionsList');
+            questionsList.innerHTML = '';
+            preview.newQuestionNames.forEach(name => {
+                questionsList.innerHTML += '<div class="preview-item">' + name + '</div>';
+            });
+        }
+        
+        async function confirmImport() {
+            if (!selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            document.getElementById('previewStep').style.display = 'none';
+            document.getElementById('importBtn').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'flex';
+            document.querySelector('.modal-footer').innerHTML = '<p class="loading-text">Importing...</p>';
+            
+            try {
+                const response = await fetch('/api/ops/import/json', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.text();
+                
+                closeUploadModal();
+                window.location.reload();
+                
+            } catch (error) {
+                alert('Import failed: ' + error.message);
+                closeUploadModal();
+            }
+        }
+    </script>
+</th:block>
+
+</body>
+</html>

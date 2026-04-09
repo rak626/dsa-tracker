@@ -2,6 +2,7 @@ package com.rakesh.dsa.tracker.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rakesh.dsa.tracker.model.Question;
+import com.rakesh.dsa.tracker.model.dto.ImportPreview;
 import com.rakesh.dsa.tracker.repository.QuestionRepository;
 import com.rakesh.dsa.tracker.service.BackupService;
 import com.rakesh.dsa.tracker.service.ExcelExportService;
@@ -63,6 +64,18 @@ public class DataOpsController {
             return ResponseEntity.ok(backupService.restore(file));
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/import/json/preview", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImportPreview> previewImport(@RequestParam("file") MultipartFile file) {
+        log.info("JSON import preview requested | file={} | size={} bytes", file.getOriginalFilename(), file.getSize());
+        try {
+            ImportPreview preview = backupService.previewImport(file);
+            return ResponseEntity.ok(preview);
+        } catch (Exception e) {
+            log.error("Preview failed", e);
+            return ResponseEntity.badRequest().build();
         }
     }
 }

@@ -6,6 +6,7 @@ import com.rakesh.dsa.tracker.github.GitHubUploader;
 import com.rakesh.dsa.tracker.model.Pattern;
 import com.rakesh.dsa.tracker.model.Question;
 import com.rakesh.dsa.tracker.model.Topic;
+import com.rakesh.dsa.tracker.model.dto.ImportPreview;
 import com.rakesh.dsa.tracker.props.AppProps;
 import com.rakesh.dsa.tracker.repository.PatternRepository;
 import com.rakesh.dsa.tracker.repository.QuestionRepository;
@@ -153,6 +154,61 @@ public class BackupService {
         }
     }
 
+
+    public ImportPreview previewImport(MultipartFile file) throws Exception {
+        if (file.isEmpty()) throw new RuntimeException("File is empty");
+
+        List<Question> incomingQuestions = objectMapper.readValue(file.getInputStream(), new TypeReference<>() {
+        });
+
+        Map<String, Topic> existingTopics = topicRepo.findAll().stream()
+                .collect(Collectors.toMap(t -> t.getName().toLowerCase(), t -> t, (a, b) -> a));
+
+        Map<String, Pattern> existingPatterns = patternRepo.findAll().stream()
+                .collect(Collectors.toMap(p -> p.getName().toLowerCase(), p -> p, (a, b) -> a));
+
+        List<String> newQuestionNames = new ArrayList<>();
+        Map<String, String> newTopicNames = new java.util.LinkedHashMap<>();
+        Map<String, String> newPatternNames = new java.util.LinkedHashMap<>();
+        int duplicateCount = 0;
+
+        for (Question jsonQ : incomingQuestions) {
+            if (questionRepository.existsByProblemLink(jsonQ.getProblemLink())) {
+                duplicateCount++;
+                continue;
+            }
+            newQuestionNames.add(jsonQ.getProblemName());
+
+            if (jsonQ.getTopics() != null) {
+                for (Topic t : jsonQ.getTopics()) {
+                    if (!existingTopics.containsKey(t.getName().toLowerCase())) {
+                        newTopicNames.put(t.getName().toLowerCase(), t.getName());
+                        existingTopics.put(t.getName().toLowerCase(), t);
+                    }
+                }
+            }
+
+            if (jsonQ.getPatterns() != null) {
+                for (Pattern p : jsonQ.getPatterns()) {
+                    if (!existingPatterns.containsKey(p.getName().toLowerCase())) {
+                        newPatternNames.put(p.getName().toLowerCase(), p.getName());
+                        existingPatterns.put(p.getName().toLowerCase(), p);
+                    }
+                }
+            }
+        }
+
+        return ImportPreview.builder()
+                .totalQuestions(incomingQuestions.size())
+                .newQuestions(incomingQuestions.size() - duplicateCount)
+                .duplicateQuestions(duplicateCount)
+                .newTopics(newTopicNames.size())
+                .newPatterns(newPatternNames.size())
+                .newQuestionNames(newQuestionNames)
+                .newTopicNames(newTopicNames)
+                .newPatternNames(newPatternNames)
+                .build();
+    }
 
     private boolean isBackupEnabled() {
         return props.getBackup() != null && props.getBackup().isEnabled();

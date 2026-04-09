@@ -1071,3 +1071,224 @@ input.filter-input[type="search"]::-webkit-search-cancel-button {
         padding: 0.75rem;
     }
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 245, 255, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--neon-pink);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.file-upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.file-upload-area:hover,
+.file-upload-area.dragover {
+    border-color: var(--neon-cyan);
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.file-upload-area svg {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.file-upload-area p {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.file-upload-area span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.file-name {
+    text-align: center;
+    color: var(--neon-cyan);
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.preview-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.preview-stat {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+}
+
+.preview-stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+}
+
+.preview-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.preview-stat-new .preview-stat-value {
+    color: var(--neon-cyan);
+}
+
+.preview-stat-dup .preview-stat-value {
+    color: var(--neon-yellow);
+}
+
+.preview-section {
+    margin-bottom: 1.25rem;
+}
+
+.preview-section h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.preview-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.preview-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+}
+
+.preview-item {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.preview-item:last-child {
+    border-bottom: none;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--neon-cyan);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: var(--text-secondary);
+}
+
+.upload-step,
+.preview-step {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
