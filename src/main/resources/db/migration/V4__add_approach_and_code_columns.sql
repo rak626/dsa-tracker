@@ -1,0 +1,3 @@
+ALTER TABLE questions
+ADD COLUMN approach TEXT,
+ADD COLUMN code TEXT;

@@ -44,6 +44,7 @@
     <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
     
     <th:block th:replace="~{fragments/ui/upload-modal :: upload-modal}"></th:block>
+    <th:block th:replace="~{fragments/ui/notes-modal :: notes-modal}"></th:block>
 </th:block>
 
 </html>

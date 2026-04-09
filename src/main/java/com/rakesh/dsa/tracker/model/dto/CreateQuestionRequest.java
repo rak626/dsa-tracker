@@ -22,4 +22,8 @@ public class CreateQuestionRequest {
     private Integer solveCount;
 
     private Integer reviseCount;
+
+    private String approach;
+
+    private String code;
 }

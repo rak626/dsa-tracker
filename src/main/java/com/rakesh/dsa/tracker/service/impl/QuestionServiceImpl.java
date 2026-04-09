@@ -59,6 +59,8 @@ public class QuestionServiceImpl implements QuestionService {
                 .lastAttemptedAt(Instant.now())
                 .topics(resolveTopics(request.getTopics()))
                 .patterns(resolvePatterns(request.getPatterns()))
+                .approach(request.getApproach())
+                .code(request.getCode())
                 .build();
         return questionRepository.save(q);
     }
@@ -183,6 +185,14 @@ public class QuestionServiceImpl implements QuestionService {
         if (req.getSolveCount() != null) {
             q.setSolveCount(req.getSolveCount());
             q.setLastAttemptedAt(Instant.now());
+        }
+
+        if (req.getApproach() != null) {
+            q.setApproach(req.getApproach());
+        }
+
+        if (req.getCode() != null) {
+            q.setCode(req.getCode());
         }
 
         return questionRepository.save(q);

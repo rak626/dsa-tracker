@@ -62,6 +62,12 @@ public class Question {
     @Column(name = "last_attempted_at")
     private Instant lastAttemptedAt;
 
+    @Column(columnDefinition = "TEXT")
+    private String approach;
+
+    @Column(columnDefinition = "TEXT")
+    private String code;
+
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

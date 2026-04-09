@@ -7,131 +7,168 @@
         <h1 class="page-title">Edit Question</h1>
     </div>
     
-    <div class="form-card">
-        <form th:action="@{/questions/{id}(id=${question.id})}"
-              th:object="${question}"
-              method="post"
-              th:id="updateForm">
-            <fieldset>
-                <div class="form-grid">
-                    <div class="form-group form-group-full">
-                        <label for="problemLink">
-                            Problem Link *
-                            <input type="url" 
-                                   id="problemLink" 
-                                   th:field="*{problemLink}" 
-                                   placeholder="https://leetcode.com/problems/..."
-                                   required>
-                        </label>
+    <form th:action="@{/questions/{id}(id=${question.id})}"
+          th:object="${question}"
+          method="post"
+          th:id="updateForm">
+        <div class="edit-form-layout">
+                    <div class="edit-form-left">
+                        <div class="form-grid">
+                            <div class="form-group form-group-full">
+                                <label for="problemLink">
+                                    Problem Link *
+                                    <input type="url" 
+                                           id="problemLink" 
+                                           th:field="*{problemLink}" 
+                                           placeholder="https://leetcode.com/problems/..."
+                                           required>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="problemName">
+                                    Problem Name
+                                    <input type="text" 
+                                           id="problemName" 
+                                           th:field="*{problemName}" 
+                                           placeholder="Two Sum">
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="videoId">
+                                    Video ID
+                                    <input type="text" 
+                                           id="videoId" 
+                                           th:field="*{videoId}" 
+                                           placeholder="Optional">
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="platform">
+                                    Platform
+                                    <input type="text" 
+                                           id="platform" 
+                                           th:field="*{platform}" 
+                                           placeholder="LEETCODE / GFG">
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="difficulty">
+                                    Difficulty
+                                    <select id="difficulty" th:field="*{difficulty}" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="EASY">EASY</option>
+                                        <option value="MEDIUM">MEDIUM</option>
+                                        <option value="HARD">HARD</option>
+                                    </select>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="solveCount">
+                                    Solve Count
+                                    <input type="number" 
+                                           id="solveCount" 
+                                           th:field="*{solveCount}" 
+                                           min="0">
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reviseCount">
+                                    Revise Count
+                                    <input type="number" 
+                                           id="reviseCount" 
+                                           th:field="*{reviseCount}" 
+                                           min="0">
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-tags">
+                            <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                'Topics (comma separated)',
+                                'topicsInput',
+                                ${question.topicNames},
+                                '/api/suggestions/topics',
+                                true,
+                                'Array, Hash Table'
+                            )}"></th:block>
+                            
+                            <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
+                                'Patterns (comma separated)',
+                                'patternsInput',
+                                ${question.patternNames},
+                                '/api/suggestions/patterns',
+                                true,
+                                'Two Pointers'
+                            )}"></th:block>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" th:form="updateForm" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                    <polyline points="7 3 7 8 15 8"/>
+                                </svg>
+                                Update
+                            </button>
+                            <a th:href="@{/questions}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" th:form="deleteForm" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this question?')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                                Delete
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="problemName">
-                            Problem Name
-                            <input type="text" 
-                                   id="problemName" 
-                                   th:field="*{problemName}" 
-                                   placeholder="Two Sum">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="videoId">
-                            Video ID
-                            <input type="text" 
-                                   id="videoId" 
-                                   th:field="*{videoId}" 
-                                   placeholder="Optional">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="platform">
-                            Platform
-                            <input type="text" 
-                                   id="platform" 
-                                   th:field="*{platform}" 
-                                   placeholder="LEETCODE / GFG">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="difficulty">
-                            Difficulty
-                            <select id="difficulty" th:field="*{difficulty}" required>
-                                <option value="">-- Select --</option>
-                                <option value="EASY">EASY</option>
-                                <option value="MEDIUM">MEDIUM</option>
-                                <option value="HARD">HARD</option>
-                            </select>
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="solveCount">
-                            Solve Count
-                            <input type="number" 
-                                   id="solveCount" 
-                                   th:field="*{solveCount}" 
-                                   min="0">
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="reviseCount">
-                            Revise Count
-                            <input type="number" 
-                                   id="reviseCount" 
-                                   th:field="*{reviseCount}" 
-                                   min="0">
-                        </label>
+                    <div class="edit-form-right">
+                        <div class="notes-section">
+                            <h3 class="notes-section-title">Solution Notes</h3>
+                            
+                            <div class="note-card">
+                                <div class="note-header">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="16" x2="12" y2="12"/>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                    </svg>
+                                    <span>Approach</span>
+                                </div>
+                                <textarea id="approachEditor" 
+                                          th:field="*{approach}"
+                                          class="markdown-editor" 
+                                          placeholder="## Approach&#10;Describe your approach here...&#10;&#10;### Complexity&#10;- Time: O(n)&#10;- Space: O(n)"
+                                          rows="8"></textarea>
+                            </div>
+
+                            <div class="note-card">
+                                <div class="note-header">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="16 18 22 12 16 6"/>
+                                        <polyline points="8 6 2 12 8 18"/>
+                                    </svg>
+                                    <span>Code</span>
+                                </div>
+                                <textarea id="codeEditor" 
+                                          th:field="*{code}"
+                                          class="markdown-editor code-editor" 
+                                          placeholder="```python&#10;def solution():&#10;    pass&#10;```"
+                                          rows="10"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="form-tags">
-                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                        'Topics (comma separated)',
-                        'topicsInput',
-                        ${question.topicNames},
-                        '/api/suggestions/topics',
-                        true,
-                        'Array, Hash Table'
-                    )}"></th:block>
-                    
-                    <th:block th:replace="~{fragments/ui/autosuggest :: autosuggest(
-                        'Patterns (comma separated)',
-                        'patternsInput',
-                        ${question.patternNames},
-                        '/api/suggestions/patterns',
-                        true,
-                        'Two Pointers'
-                    )}"></th:block>
-                </div>
-            </fieldset>
         </form>
         
         <form th:id="deleteForm" th:action="@{/questions/{id}/delete(id=${question.id})}" method="post">
         </form>
-        
-        <div class="form-actions">
-            <button type="submit" th:form="updateForm" class="btn btn-primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                    <polyline points="17 21 17 13 7 13 7 21"/>
-                    <polyline points="7 3 7 8 15 8"/>
-                </svg>
-                Update
-            </button>
-            <a th:href="@{/questions}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" th:form="deleteForm" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this question?')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                </svg>
-                Delete
-            </button>
-        </div>
-    </div>
 </th:block>
 
 </html>

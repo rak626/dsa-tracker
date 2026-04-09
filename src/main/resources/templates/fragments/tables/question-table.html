@@ -58,29 +58,63 @@
                             <span class="count-badge" th:text="${q.reviseCount}"></span>
                         </td>
                         <td class="actions-cell">
-                            <a th:href="@{/questions/{id}/solve(id=${q.id})}" 
-                               class="action-btn action-toggle"
-                               title="Toggle Solve">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </a>
-                            <a th:href="@{/questions/{id}/revise(id=${q.id})}" 
-                               class="action-btn action-revise"
-                               title="Add Revision">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="23 4 23 10 17 10"/>
-                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                                </svg>
-                            </a>
-                            <a th:href="@{/questions/edit/{id}(id=${q.id})}" 
-                               class="action-btn action-edit"
-                               title="Edit">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                </svg>
-                            </a>
+                            <div class="action-dropdown">
+                                <button type="button" class="dropdown-trigger" onclick="toggleDropdown(this)" aria-label="Actions">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"/>
+                                        <circle cx="12" cy="5" r="1"/>
+                                        <circle cx="12" cy="19" r="1"/>
+                                    </svg>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a th:if="${q.approach != null or q.code != null}"
+                                       href="#" 
+                                       class="dropdown-item"
+                                       th:data-id="${q.id}"
+                                       th:data-name="${q.problemName}"
+                                       th:data-approach="${q.approach != null ? q.approach : ''}"
+                                       th:data-code="${q.code != null ? q.code : ''}"
+                                       onclick="openNotesModal(this); return false;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 18V5l12-2v13"/>
+                                            <circle cx="6" cy="18" r="3"/>
+                                            <circle cx="18" cy="16" r="3"/>
+                                        </svg>
+                                        Solution
+                                    </a>
+                                    <div class="dropdown-divider" th:if="${q.approach != null or q.code != null}"></div>
+                                    <a th:href="@{/questions/{id}/solve(id=${q.id})}" class="dropdown-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        Toggle Solve
+                                    </a>
+                                    <a th:href="@{/questions/{id}/revise(id=${q.id})}" class="dropdown-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="23 4 23 10 17 10"/>
+                                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                        </svg>
+                                        Add Revision
+                                    </a>
+                                    <a th:href="@{/questions/edit/{id}(id=${q.id})}" class="dropdown-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a th:href="@{/questions/delete/{id}(id=${q.id})}" 
+                                       class="dropdown-item dropdown-item-danger"
+                                       onclick="return confirm('Delete this question?')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"/>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                        </svg>
+                                        Delete
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
