@@ -112,7 +112,30 @@ public class QuestionServiceImpl implements QuestionService {
     public String getRandomQuestion() {
         List<Question> all = questionRepository.findAll();
         if (all.isEmpty()) throw new NoSuchElementException("No questions available");
-        return all.get(ThreadLocalRandom.current().nextInt(all.size())).getProblemLink();
+
+        // Calculate weights: higher weight for lower solve/revise counts
+        // Weight = 1.0 / (solveCount + reviseCount + 1)
+        double totalWeight = 0;
+        List<Double> weights = new ArrayList<>();
+        for (Question q : all) {
+            int solveCount = q.getSolveCount() != null ? q.getSolveCount() : 0;
+            int reviseCount = q.getReviseCount() != null ? q.getReviseCount() : 0;
+            double weight = 1.0 / (solveCount + reviseCount + 1.0);
+            weights.add(weight);
+            totalWeight += weight;
+        }
+
+        // Weighted random selection
+        double randomValue = ThreadLocalRandom.current().nextDouble() * totalWeight;
+        double cumulativeWeight = 0;
+        for (int i = 0; i < all.size(); i++) {
+            cumulativeWeight += weights.get(i);
+            if (randomValue <= cumulativeWeight) {
+                return all.get(i).getProblemLink();
+            }
+        }
+
+        return all.get(all.size() - 1).getProblemLink();
     }
 
     @Override

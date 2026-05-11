@@ -72,6 +72,7 @@
             </div>
             
             <div class="modal-footer">
+                <p id="importLoadingText" class="loading-text" style="display: none; margin: 0; flex-grow: 1; text-align: left;">Importing...</p>
                 <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
                 <button type="button" class="btn btn-primary" id="previewBtn" onclick="previewImport()" disabled>
                     Preview Import
@@ -123,14 +124,32 @@
         
         function resetModal() {
             selectedFile = null;
-            document.getElementById('jsonFileInput').value = '';
-            document.getElementById('fileName').textContent = '';
-            document.getElementById('previewBtn').disabled = true;
-            document.getElementById('importBtn').style.display = 'none';
-            document.getElementById('previewBtn').style.display = '';
-            document.getElementById('uploadStep').style.display = '';
-            document.getElementById('previewStep').style.display = 'none';
-            document.getElementById('loadingState').style.display = 'none';
+            const fileInput = document.getElementById('jsonFileInput');
+            if (fileInput) fileInput.value = '';
+            
+            const fileName = document.getElementById('fileName');
+            if (fileName) fileName.textContent = '';
+            
+            const previewBtn = document.getElementById('previewBtn');
+            if (previewBtn) {
+                previewBtn.disabled = true;
+                previewBtn.style.display = '';
+            }
+            
+            const importBtn = document.getElementById('importBtn');
+            if (importBtn) importBtn.style.display = 'none';
+            
+            const loadingText = document.getElementById('importLoadingText');
+            if (loadingText) loadingText.style.display = 'none';
+
+            const uploadStep = document.getElementById('uploadStep');
+            if (uploadStep) uploadStep.style.display = '';
+
+            const previewStep = document.getElementById('previewStep');
+            if (previewStep) previewStep.style.display = 'none';
+
+            const loadingState = document.getElementById('loadingState');
+            if (loadingState) loadingState.style.display = 'none';
         }
         
         async function previewImport() {
@@ -208,10 +227,14 @@
             const formData = new FormData();
             formData.append('file', selectedFile);
             
+            const importBtn = document.getElementById('importBtn');
+            const loadingText = document.getElementById('importLoadingText');
+
             document.getElementById('previewStep').style.display = 'none';
-            document.getElementById('importBtn').style.display = 'none';
+            if (importBtn) importBtn.style.display = 'none';
+            if (loadingText) loadingText.style.display = 'block';
+            
             document.getElementById('loadingState').style.display = 'flex';
-            document.querySelector('.modal-footer').innerHTML = '<p class="loading-text">Importing...</p>';
             
             try {
                 const response = await fetch('/api/ops/import/json', {
