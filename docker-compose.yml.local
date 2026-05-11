@@ -39,9 +39,9 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/dsa_tracker
       DB_USERNAME: rakesh
       DB_PASSWORD: rakesh123_admin
-      GITHUB_TOKEN: ${GITHUB_TOKEN:}
+      GITHUB_BACKUP_TOKEN: ${GITHUB_BACKUP_TOKEN:-}
       ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
 
     ports:
       - "5050:5050"
