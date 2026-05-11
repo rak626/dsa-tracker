@@ -119,7 +119,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public Question incrementSolve(Long id) {
         Question q = questionRepository.findById(id).orElseThrow(() -> new RuntimeException("Question not found"));
-        q.setSolveCount((q.getSolveCount() == null ? 1 : q.getSolveCount()) + 1);
+        q.setSolveCount((q.getSolveCount() == null ? 0 : q.getSolveCount()) + 1);
         q.setLastAttemptedAt(Instant.now());
         return questionRepository.save(q);
     }
