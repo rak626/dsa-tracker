@@ -4,40 +4,115 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
   <title>{{.Title}} · DSA Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2334d399'/%3E%3Cpath d='M13 10l-5 6 5 6M19 10l5 6-5 6' stroke='%2304160f' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="/static/app.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b8cff'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='13' font-weight='700' text-anchor='middle' fill='%23080c14'%3EDSA%3C/text%3E%3C/svg%3E">
+  <script src="/static/theme.js"></script>
 </head>
-<body class="min-h-screen bg-bg text-ink antialiased">
-  <header class="border-b border-edge bg-surface">
-    <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:gap-5">
-      <a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
-        <span class="grid h-7 w-7 place-items-center rounded-lg bg-brand text-[11px] font-bold text-brand-ink">DS</span>
-        <span class="hidden sm:inline">DSA Tracker</span>
+<body class="min-h-screen antialiased">
+  <header class="header-bar">
+    <div class="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4 sm:gap-5 sm:px-6">
+      <a href="/" class="flex items-center gap-2.5" aria-label="DSA Tracker home">
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 10l-5 6 5 6M19 10l5 6-5 6"/>
+          </svg>
+        </span>
+        <span class="hidden text-[15px] font-semibold tracking-tight sm:inline">DSA Tracker</span>
       </a>
+
       {{if ne .Nav "login"}}
-      <nav class="ml-auto flex items-center gap-1 text-sm">
-        <a href="/" class="{{if eq .Nav "today"}}nav-link nav-active{{else}}nav-link{{end}}">Today</a>
-        <a href="/questions" class="{{if eq .Nav "questions"}}nav-link nav-active{{else}}nav-link{{end}}">Questions</a>
-        <a href="/settings" class="{{if eq .Nav "settings"}}nav-link nav-active{{else}}nav-link{{end}}">Settings</a>
+      <nav class="ml-auto flex items-center gap-0.5" aria-label="Main">
+        <a href="/" class="nav-link {{if eq .Nav "today"}}nav-active{{end}}">Today</a>
+        <a href="/questions" class="nav-link {{if eq .Nav "questions"}}nav-active{{end}}">Questions</a>
+        <a href="/settings" class="nav-link {{if eq .Nav "settings"}}nav-active{{end}}">Settings</a>
       </nav>
-      <form method="post" action="/logout" class="ml-1">
-        <input type="hidden" name="_csrf" value="{{.CSRF}}">
-        <button class="btn btn-ghost btn-sm" type="submit">Sign out</button>
-      </form>
+      {{else}}
+      <span class="ml-auto"></span>
       {{end}}
+      <div class="flex items-center gap-0.5">
+        {{if ne .Nav "login"}}
+        <button class="btn btn-icon hidden sm:inline-flex" type="button" data-open-shortcuts
+                aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">
+          <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2.5"/>
+            <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/>
+          </svg>
+        </button>
+        {{end}}
+        <button class="btn btn-icon" type="button" data-theme-toggle
+                aria-label="Switch colour theme" title="Theme">
+          <svg data-theme-icon="system" viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="4" width="19" height="13" rx="2"/>
+            <path d="M8.5 21h7M12 17v4"/>
+          </svg>
+          <svg data-theme-icon="light" viewBox="0 0 24 24" class="hidden h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>
+          </svg>
+          <svg data-theme-icon="dark" viewBox="0 0 24 24" class="hidden h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>
+          </svg>
+        </button>
+        {{if ne .Nav "login"}}
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="{{.CSRF}}">
+          <button class="btn btn-icon" type="submit" aria-label="Sign out" title="Sign out">
+            <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3M16 17l5-5-5-5M21 12H9"/>
+            </svg>
+          </button>
+        </form>
+        {{end}}
+      </div>
     </div>
   </header>
-  <main class="mx-auto w-full max-w-5xl px-4 py-6 sm:py-8">
-    {{if .Notice}}<div class="flash flash-ok" role="status">{{.Notice}}</div>{{end}}
-    {{if .Error}}<div class="flash flash-err" role="alert">{{.Error}}</div>{{end}}
+
+  <main class="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 sm:py-9">
+    {{if .Notice}}<div class="flash flash-ok" role="status" data-flash="notice">{{.Notice}}</div>{{end}}
+    {{if .Error}}<div class="flash flash-err" role="alert" data-flash="error">{{.Error}}</div>{{end}}
 {{end}}
 
 {{define "footer"}}
   </main>
-  <footer class="mx-auto max-w-5xl px-4 pb-10 pt-4 text-xs text-muted">
-    Daily DSA practice · deterministic set, spaced by importance and recency.
+
+  <footer class="mx-auto max-w-6xl px-4 pb-10 pt-2 text-xs text-muted sm:px-6">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-edge pt-5">
+      <span>Daily DSA practice · deterministic set, spaced by importance and recency.</span>
+      <span class="hidden sm:inline">Press <kbd class="kbd">?</kbd> for shortcuts</span>
+    </div>
   </footer>
+
+  <div id="toasts" class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-4 sm:items-end sm:p-5"
+       aria-live="polite" aria-atomic="false"></div>
+
+  <div id="shortcuts" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+    <div class="modal-panel">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="eyebrow">Navigation</p>
+          <h2 id="shortcuts-title" class="mt-1 text-lg font-semibold">Keyboard shortcuts</h2>
+        </div>
+        <button class="btn btn-icon" type="button" data-close-shortcuts aria-label="Close shortcuts">
+          <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="mt-4">
+        <div class="shortcut-row"><span>Mark as solved</span><span><kbd class="kbd">1</kbd></span></div>
+        <div class="shortcut-row"><span>Mark for revision</span><span><kbd class="kbd">2</kbd></span></div>
+        <div class="shortcut-row"><span>Skip this question</span><span><kbd class="kbd">3</kbd></span></div>
+        <div class="shortcut-row"><span>Open the problem</span><span><kbd class="kbd">o</kbd></span></div>
+        <div class="shortcut-row"><span>Watch the lecture</span><span><kbd class="kbd">w</kbd></span></div>
+        <div class="shortcut-row"><span>Search questions</span><span><kbd class="kbd">/</kbd></span></div>
+        <div class="shortcut-row"><span>Cycle colour theme</span><span><kbd class="kbd">t</kbd></span></div>
+        <div class="shortcut-row"><span>Show / hide this panel</span><span><kbd class="kbd">?</kbd> <kbd class="kbd">Esc</kbd></span></div>
+      </div>
+    </div>
+  </div>
+
   <script src="/static/app.js" defer></script>
 </body>
 </html>

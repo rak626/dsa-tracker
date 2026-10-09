@@ -81,6 +81,7 @@ func parseViews() (map[string]*template.Template, error) {
 			}
 			return out
 		},
+		"list": func(values ...int) []int { return values },
 		// ringOffset returns the SVG stroke offset for a 26px radius circle.
 		"ringOffset": func(done, total int) string {
 			const circumference = 163.36

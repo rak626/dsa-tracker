@@ -1,47 +1,61 @@
 {{define "questions"}}
 {{template "header" .}}
-  <div class="flex flex-wrap items-end justify-between gap-4">
-    <div>
-      <p class="text-xs uppercase tracking-widest text-muted">Question bank</p>
-      <h1 class="mt-1 text-2xl font-semibold tracking-tight">{{len .Rows}} questions</h1>
+  <div class="animate-rise">
+    <p class="eyebrow">Question bank</p>
+    <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+        <span id="q-count">{{len .Rows}}</span> questions
+      </h1>
+      <div class="text-sm text-muted">
+        <p><span class="text-ok font-medium">{{.Stats.SolvedDistinct}}</span> solved · {{.Stats.ReviseEntries}} revisions</p>
+        <p class="mt-0.5">{{.DoneToday}} in today's set</p>
+      </div>
     </div>
-    <div class="text-right text-sm text-muted">
-      <p>{{.Stats.SolvedDistinct}} solved · {{.Stats.ReviseEntries}} revisions</p>
-      <p>{{.DoneToday}} in today's set</p>
+  </div>
+
+  <div class="sticky top-14 z-30 -mx-4 mt-6 border-b border-edge bg-bg/85 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
+    <div class="flex flex-col gap-3">
+      <div class="relative">
+        <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+        </svg>
+        <input class="input input-search" type="search" id="q-search"
+               placeholder="Search by title, topic or platform…" autocomplete="off">
+        <kbd class="kbd absolute right-3 top-1/2 hidden -translate-y-1/2 sm:inline-grid">/</kbd>
+      </div>
+      <div class="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="list">
+        <a class="chip {{if eq .ActiveTopic ""}}chip-on{{end}}" href="/questions">All</a>
+        {{range .Topics}}
+          <a class="chip {{if eq $.ActiveTopic .}}chip-on{{end}}" href="/questions?topic={{urlquery .}}">{{.}}</a>
+        {{end}}
+      </div>
     </div>
   </div>
 
-  <div class="mt-5 flex flex-wrap items-center gap-2">
-    <a class="chip {{if eq .ActiveTopic ""}}chip-on{{end}}" href="/questions">All</a>
-    {{range .Topics}}
-      <a class="chip {{if eq $.ActiveTopic .}}chip-on{{end}}" href="/questions?topic={{urlquery .}}">{{.}}</a>
-    {{end}}
-  </div>
+  <p id="q-empty" class="card mt-6 hidden text-center text-sm text-muted">
+    No questions match that search. Try a different keyword.
+  </p>
 
-  <div class="mt-4">
-    <input class="input" type="search" id="q-search" placeholder="Search by title, topic or platform…" autocomplete="off">
-  </div>
-
-  <p id="q-empty" class="card mt-6 hidden text-sm text-muted">No questions match that search.</p>
-
-  <ul class="mt-4 space-y-2" id="q-list">
+  <ul class="stagger mt-5 space-y-2" id="q-list">
     {{range .Rows}}
     <li class="row" data-search="{{lower .Question.Title}} {{lower .Question.Platform}} {{lower (join .Question.Topics " ")}} {{lower .Question.Subtopic}}">
+      <span class="status-dot {{if eq .TodayAction "solve"}}status-dot-solve{{else if eq .TodayAction "revise"}}status-dot-revise{{else if eq .TodayAction "skip"}}status-dot-skip{{end}}"></span>
       <div class="min-w-0 flex-1">
         {{if .Question.URL}}
-          <a class="truncate link" href="{{.Question.URL}}" target="_blank" rel="noopener noreferrer">{{.Question.Title}}</a>
+          <a class="link truncate" href="{{.Question.URL}}" target="_blank" rel="noopener noreferrer">{{.Question.Title}}</a>
         {{else}}
-          <span class="truncate">{{.Question.Title}}</span>
+          <span class="block truncate">{{.Question.Title}}</span>
         {{end}}
-        <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
+        <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
           {{range .Question.Topics}}<span class="chip chip-soft">{{.}}</span>{{end}}
-          {{if .Question.Platform}}<span>{{.Question.Platform}}</span>{{end}}
+          {{if .Question.Platform}}<span class="font-medium text-muted">{{.Question.Platform}}</span>{{end}}
           {{if .Question.HasPriority}}<span class="text-warn">priority {{.Question.ImportanceLabel}}/5</span>{{end}}
         </div>
       </div>
       <div class="flex shrink-0 items-center gap-3 text-xs text-muted">
-        <span title="solves">{{.Progress.SolveCount}} solved</span>
-        <span title="revisions">{{.Progress.ReviseCount}} revised</span>
+        <span class="hidden sm:inline" title="solves"><span class="font-medium text-ink">{{.Progress.SolveCount}}</span> solved</span>
+        <span class="hidden sm:inline" title="revisions"><span class="font-medium text-ink">{{.Progress.ReviseCount}}</span> revised</span>
         {{if .TodayAction}}
           <span class="status status-ok">{{.TodayAction}}</span>
         {{else}}

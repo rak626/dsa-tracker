@@ -1,111 +1,176 @@
 {{define "today"}}
 {{template "header" .}}
-  <div class="flex flex-wrap items-start justify-between gap-4">
-    <div>
-      <p class="text-xs uppercase tracking-widest text-muted">Daily set</p>
-      <h1 class="mt-1 text-2xl font-semibold tracking-tight">{{.Day}}</h1>
-    </div>
-    <div class="flex items-center gap-3">
-      <svg viewBox="0 0 60 60" class="h-14 w-14 -rotate-90" aria-hidden="true">
-        <circle cx="30" cy="30" r="26" fill="none" stroke="var(--color-edge)" stroke-width="6"/>
-        <circle cx="30" cy="30" r="26" fill="none" stroke="var(--color-brand)" stroke-width="6"
-                stroke-linecap="round" stroke-dasharray="163.36"
-                style="stroke-dashoffset: {{ringOffset .Done .Total}}"/>
-      </svg>
+
+  <header class="animate-rise">
+    <p class="eyebrow">Daily set</p>
+    <div class="mt-2 flex flex-wrap items-end justify-between gap-5">
       <div>
-        <p class="text-2xl font-semibold leading-none">{{.Done}}<span class="text-muted">/{{.Total}}</span></p>
-        <p class="text-xs text-muted">completed</p>
+        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">{{.Day}}</h1>
+        <p class="mt-2 text-sm text-muted">
+          {{if .Total}}{{.Done}} of {{.Total}} completed{{else}}No set for today{{end}}
+        </p>
+      </div>
+      <div class="flex items-center gap-3.5">
+        <svg viewBox="0 0 60 60" class="h-16 w-16 -rotate-90" aria-hidden="true">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--color-surface-2)" stroke-width="6"/>
+          <circle class="ring-progress" cx="30" cy="30" r="26" fill="none"
+                  stroke="var(--color-brand)" stroke-width="6" stroke-linecap="round"
+                  stroke-dasharray="163.36" style="stroke-dashoffset: {{ringOffset .Done .Total}}"/>
+        </svg>
+        <div>
+          <p class="text-3xl font-semibold leading-none tabular-nums">
+            {{.Done}}<span class="text-muted">/{{.Total}}</span>
+          </p>
+          <p class="mt-1 text-xs uppercase tracking-widest text-muted">completed</p>
+        </div>
       </div>
     </div>
-  </div>
-
-  {{if .Current}}
-  <article class="card mt-6">
-    <p class="text-xs uppercase tracking-widest text-muted">Question {{.Current.Position}} of {{.Total}}</p>
-    <h2 class="mt-2 text-xl font-semibold leading-snug sm:text-2xl">{{.Current.Question.Title}}</h2>
-
-    <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
-      {{range .Current.Question.Topics}}<span class="chip">{{.}}</span>{{end}}
-      {{if .Current.Question.Subtopic}}<span class="chip chip-soft">{{.Current.Question.Subtopic}}</span>{{end}}
-      {{if .Current.Question.Platform}}<span class="chip chip-brand">{{.Current.Question.Platform}}</span>{{end}}
-      {{if .Current.Question.HasPriority}}<span class="chip chip-warn">Priority {{.Current.Question.ImportanceLabel}}/5</span>{{end}}
-      {{if .Current.Question.VideoTitle}}<span class="chip chip-soft">{{.Current.Question.VideoTitle}}</span>{{end}}
+    <div class="progress mt-5" role="progressbar" aria-valuenow="{{.Done}}" aria-valuemin="0" aria-valuemax="{{.Total}}">
+      <div class="progress-fill" style="width: {{pct .Done .Total}}%"></div>
     </div>
+  </header>
 
-    <div class="mt-5 flex flex-wrap gap-2">
-      {{if .Current.Question.URL}}
-        <a class="btn btn-primary" href="{{.Current.Question.URL}}" target="_blank" rel="noopener noreferrer">Open problem ↗</a>
-      {{end}}
-      {{if .Current.Question.VideoURL}}
-        <a class="btn btn-ghost" href="{{.Current.Question.VideoURL}}" target="_blank" rel="noopener noreferrer">Watch lecture ↗</a>
-      {{end}}
-      <button class="btn btn-ghost btn-sm" type="button" data-copy="{{.Current.Question.URL}}">Copy link</button>
-    </div>
-
-    <div class="mt-5 flex flex-wrap gap-2 border-t border-edge pt-4">
-      <form method="post" action="/practice">
-        <input type="hidden" name="_csrf" value="{{.CSRF}}">
-        <input type="hidden" name="question_id" value="{{.Current.Question.ID}}">
-        <input type="hidden" name="next" value="/">
-        <input type="hidden" name="action" value="solve">
-        <button class="btn btn-ok" type="submit">Solved it</button>
-      </form>
-      <form method="post" action="/practice">
-        <input type="hidden" name="_csrf" value="{{.CSRF}}">
-        <input type="hidden" name="question_id" value="{{.Current.Question.ID}}">
-        <input type="hidden" name="next" value="/">
-        <input type="hidden" name="action" value="revise">
-        <button class="btn btn-warn" type="submit">Needs revision</button>
-      </form>
-      <form method="post" action="/practice">
-        <input type="hidden" name="_csrf" value="{{.CSRF}}">
-        <input type="hidden" name="question_id" value="{{.Current.Question.ID}}">
-        <input type="hidden" name="next" value="/">
-        <input type="hidden" name="action" value="skip">
-        <button class="btn btn-ghost" type="submit">Skip</button>
-      </form>
-    </div>
-  </article>
-  {{else}}
-  <div class="card mt-6 text-center">
-    <p class="text-lg font-semibold">Today's set is complete 🎉</p>
-    <p class="mt-1 text-sm text-muted">Come back tomorrow for a fresh batch of {{.Size}} questions.</p>
-    <a class="btn btn-ghost mt-4" href="/questions">Review all questions</a>
-  </div>
-  {{end}}
-
-  <section class="mt-8">
-    <div class="flex items-center justify-between">
-      <h2 class="text-sm font-medium uppercase tracking-widest text-muted">Today's set</h2>
-      <span class="text-xs text-muted">{{.Done}}/{{.Total}} done</span>
-    </div>
-    <ol class="mt-3 space-y-2">
-      {{range .Items}}
-      <li class="row {{if .Done}}row-done{{end}}">
-        <span class="num">{{.Position}}</span>
-        <div class="min-w-0 flex-1">
-          {{if .Question.URL}}
-            <a class="truncate link" href="{{.Question.URL}}" target="_blank" rel="noopener noreferrer">{{.Question.Title}}</a>
-          {{else}}
-            <span class="truncate">{{.Question.Title}}</span>
-          {{end}}
-          <div class="mt-1 flex flex-wrap gap-1.5 text-[11px] text-muted">
-            {{range .Question.Topics}}<span>{{.}}</span>{{end}}
+  <div class="mt-7 grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div class="min-w-0 lg:col-start-1 lg:row-start-1">
+      {{if .Current}}
+      <article class="card animate-rise">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="eyebrow">Question {{.Current.Position}} of {{.Total}}</p>
+          <div class="dots" aria-hidden="true">
+            {{range .Items}}
+              <span class="dot {{if .Done}}dot-done{{else if $.Current}}{{if eq .Position $.Current.Position}}dot-current{{end}}{{end}}"></span>
+            {{end}}
           </div>
         </div>
-        <span class="status {{if .Done}}status-ok{{end}}">
-          {{if eq .Action "solve"}}solved{{else if eq .Action "revise"}}revise{{else if eq .Action "skip"}}skipped{{else}}pending{{end}}
-        </span>
-      </li>
-      {{end}}
-    </ol>
-  </section>
 
-  <section class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-    <div class="stat"><p class="stat-value">{{.Stats.QuestionCount}}</p><p class="stat-label">questions</p></div>
-    <div class="stat"><p class="stat-value">{{.Stats.SolvedDistinct}}</p><p class="stat-label">solved once</p></div>
-    <div class="stat"><p class="stat-value">{{.Stats.SolveEntries}}</p><p class="stat-label">solves logged</p></div>
-    <div class="stat"><p class="stat-value">{{.Stats.ReviseEntries}}</p><p class="stat-label">revisions</p></div>
-  </section>
+        <h2 class="mt-3 text-2xl font-semibold leading-tight sm:text-3xl">
+          {{.Current.Question.Title}}
+        </h2>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          {{range .Current.Question.Topics}}<span class="chip chip-brand">{{.}}</span>{{end}}
+          {{if .Current.Question.Subtopic}}<span class="chip chip-soft">{{.Current.Question.Subtopic}}</span>{{end}}
+          {{if .Current.Question.Platform}}<span class="chip">{{.Current.Question.Platform}}</span>{{end}}
+          {{if .Current.Question.HasPriority}}<span class="chip chip-warn">Priority {{.Current.Question.ImportanceLabel}}/5</span>{{end}}
+          {{if .Current.Question.VideoTitle}}<span class="chip chip-soft hidden sm:inline-flex">{{.Current.Question.VideoTitle}}</span>{{end}}
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-2">
+          {{if .Current.Question.URL}}
+            <a class="btn btn-primary btn-lg" href="{{.Current.Question.URL}}" target="_blank" rel="noopener noreferrer"
+               data-open-link>
+              Open problem
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              <kbd class="kbd">o</kbd>
+            </a>
+          {{end}}
+          {{if .Current.Question.VideoURL}}
+            <a class="btn btn-ghost btn-lg" href="{{.Current.Question.VideoURL}}" target="_blank" rel="noopener noreferrer" data-video-link>
+              Watch lecture
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.5"/></svg>
+              <kbd class="kbd">w</kbd>
+            </a>
+          {{end}}
+          {{if .Current.Question.URL}}
+            <button class="btn btn-ghost btn-lg" type="button" data-copy="{{.Current.Question.URL}}">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M6 15H5.5A2.5 2.5 0 0 1 3 12.5v-7A2.5 2.5 0 0 1 5.5 3h7A2.5 2.5 0 0 1 15 5.5V6"/></svg>
+              Copy link
+            </button>
+          {{end}}
+        </div>
+
+        <div class="divider mt-6 flex flex-wrap gap-2 pt-5">
+          <form method="post" action="/practice">
+            <input type="hidden" name="_csrf" value="{{.CSRF}}">
+            <input type="hidden" name="question_id" value="{{.Current.Question.ID}}">
+            <input type="hidden" name="next" value="/">
+            <input type="hidden" name="action" value="solve">
+            <button class="btn btn-ok btn-lg" type="submit">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+              Solved it
+              <kbd class="kbd">1</kbd>
+            </button>
+          </form>
+          <form method="post" action="/practice">
+            <input type="hidden" name="_csrf" value="{{.CSRF}}">
+            <input type="hidden" name="question_id" value="{{.Current.Question.ID}}">
+            <input type="hidden" name="next" value="/">
+            <input type="hidden" name="action" value="revise">
+            <button class="btn btn-warn btn-lg" type="submit">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4h-4"/></svg>
+              Needs revision
+              <kbd class="kbd">2</kbd>
+            </button>
+          </form>
+          <form method="post" action="/practice">
+            <input type="hidden" name="_csrf" value="{{.CSRF}}">
+            <input type="hidden" name="question_id" value="{{.Current.Question.ID}}">
+            <input type="hidden" name="next" value="/">
+            <input type="hidden" name="action" value="skip">
+            <button class="btn btn-ghost btn-lg" type="submit">
+              Skip
+              <kbd class="kbd">3</kbd>
+            </button>
+          </form>
+        </div>
+      </article>
+      {{else}}
+      <div class="card animate-rise text-center">
+        <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-surface-2 text-brand">
+          <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+        </div>
+        <p class="mt-4 text-xl font-semibold">Today's set is complete</p>
+        <p class="mt-1.5 text-sm text-muted">A fresh batch of {{.Size}} questions lands at midnight.</p>
+        <a class="btn btn-ghost mt-5" href="/questions">Review all questions</a>
+      </div>
+      {{end}}
+    </div>
+
+    <aside class="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+      <div class="rail space-y-4">
+        <section class="card card-pad-sm">
+          <div class="flex items-center justify-between">
+            <p class="eyebrow">Today's set</p>
+            <span class="status {{if .Done}}status-ok{{end}}">{{.Done}}/{{.Total}}</span>
+          </div>
+          <ol class="mt-3 space-y-1.5">
+            {{range .Items}}
+            <li class="flex items-center gap-2.5 rounded-lg border border-edge bg-surface-2/50 px-3 py-2 transition">
+              <span class="status-dot {{if eq .Action "solve"}}status-dot-solve{{else if eq .Action "revise"}}status-dot-revise{{else if eq .Action "skip"}}status-dot-skip{{end}}"></span>
+              <span class="min-w-0 flex-1 truncate text-[13px] {{if .Done}}text-muted{{end}}">
+                {{if .Question.URL}}
+                  <a href="{{.Question.URL}}" target="_blank" rel="noopener noreferrer" class="hover:text-brand">{{.Question.Title}}</a>
+                {{else}}
+                  {{.Question.Title}}
+                {{end}}
+              </span>
+              <span class="num num-sm">{{.Position}}</span>
+            </li>
+            {{end}}
+          </ol>
+        </section>
+
+        <section class="card card-pad-sm hidden lg:block">
+          <p class="eyebrow">Shortcuts</p>
+          <ul class="mt-3 space-y-2 text-[13px] text-muted">
+            <li class="flex items-center justify-between"><span>Solved / revise / skip</span><span><kbd class="kbd">1</kbd> <kbd class="kbd">2</kbd> <kbd class="kbd">3</kbd></span></li>
+            <li class="flex items-center justify-between"><span>Open problem</span><kbd class="kbd">o</kbd></li>
+            <li class="flex items-center justify-between"><span>Search</span><kbd class="kbd">/</kbd></li>
+            <li class="flex items-center justify-between"><span>Theme</span><kbd class="kbd">t</kbd></li>
+            <li class="flex items-center justify-between"><span>All shortcuts</span><kbd class="kbd">?</kbd></li>
+          </ul>
+        </section>
+      </div>
+    </aside>
+
+    <div class="min-w-0 space-y-5 lg:col-start-1 lg:row-start-2">
+      <section class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="tile"><p class="tile-value">{{.Stats.QuestionCount}}</p><p class="tile-label">questions</p></div>
+        <div class="tile"><p class="tile-value">{{.Stats.SolvedDistinct}}</p><p class="tile-label">solved once</p></div>
+        <div class="tile"><p class="tile-value">{{.Stats.SolveEntries}}</p><p class="tile-label">solves logged</p></div>
+        <div class="tile"><p class="tile-value">{{.Stats.ReviseEntries}}</p><p class="tile-label">revisions</p></div>
+      </section>
+    </div>
+  </div>
 {{template "footer" .}}
 {{end}}
