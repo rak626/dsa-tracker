@@ -3,6 +3,8 @@
 node_modules
 docs
 *.md
+.env
+.env.*
 Dockerfile
 Dockerfile.vercel
 docker-compose*.yml
