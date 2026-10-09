@@ -1,0 +1,44 @@
+{{define "header"}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · DSA Tracker</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b8cff'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='13' font-weight='700' text-anchor='middle' fill='%23080c14'%3EDSA%3C/text%3E%3C/svg%3E">
+</head>
+<body class="min-h-screen bg-bg text-ink antialiased">
+  <header class="border-b border-edge bg-surface">
+    <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:gap-5">
+      <a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
+        <span class="grid h-7 w-7 place-items-center rounded-lg bg-brand text-[11px] font-bold text-brand-ink">DS</span>
+        <span class="hidden sm:inline">DSA Tracker</span>
+      </a>
+      {{if ne .Nav "login"}}
+      <nav class="ml-auto flex items-center gap-1 text-sm">
+        <a href="/" class="{{if eq .Nav "today"}}nav-link nav-active{{else}}nav-link{{end}}">Today</a>
+        <a href="/questions" class="{{if eq .Nav "questions"}}nav-link nav-active{{else}}nav-link{{end}}">Questions</a>
+        <a href="/settings" class="{{if eq .Nav "settings"}}nav-link nav-active{{else}}nav-link{{end}}">Settings</a>
+      </nav>
+      <form method="post" action="/logout" class="ml-1">
+        <input type="hidden" name="_csrf" value="{{.CSRF}}">
+        <button class="btn btn-ghost btn-sm" type="submit">Sign out</button>
+      </form>
+      {{end}}
+    </div>
+  </header>
+  <main class="mx-auto w-full max-w-5xl px-4 py-6 sm:py-8">
+    {{if .Notice}}<div class="flash flash-ok" role="status">{{.Notice}}</div>{{end}}
+    {{if .Error}}<div class="flash flash-err" role="alert">{{.Error}}</div>{{end}}
+{{end}}
+
+{{define "footer"}}
+  </main>
+  <footer class="mx-auto max-w-5xl px-4 pb-10 pt-4 text-xs text-muted">
+    Daily DSA practice · deterministic set, spaced by importance and recency.
+  </footer>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
+{{end}}

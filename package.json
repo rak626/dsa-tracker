@@ -1,0 +1,13 @@
+{
+  "name": "dsa-tracker-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:css": "tailwindcss -i web/static/src/app.css -o web/static/app.css --minify",
+    "watch:css": "tailwindcss -i web/static/src/app.css -o web/static/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.14",
+    "tailwindcss": "^4.1.14"
+  }
+}

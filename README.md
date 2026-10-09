@@ -1,259 +1,145 @@
 # DSA Tracker
 
-A personal DSA problem tracker to track your LeetCode/GFG practice progress with analytics dashboard.
+A private, single-user DSA practice tracker. Every day it hands you a small,
+deterministic set of questions chosen from your Excel question bank — weighted
+by importance, recency and how often you have already solved each problem.
 
-## Features
+- **Stack:** Go · PostgreSQL · Tailwind CSS · server-rendered HTML (no SPA)
+- **Deploy:** one container on Vercel (Hobby plan) + Neon Postgres (free tier)
+- **Image size:** ~34 MB
 
-- **Question Management** - Add, edit, delete DSA problems with metadata
-- **Topic & Pattern Tracking** - Organize problems by topics and patterns
-- **Analytics Dashboard** - Visualize your progress with charts
-- **Revision Tracking** - Track how many times you've revised each problem
-- **GitHub Backup** - Automatic daily backups to GitHub
-- **Excel Export** - Export all questions to Excel
-- **REST API** - Full REST API for programmatic access
-- **API Documentation** - Swagger UI for API exploration
-- **Security** - Basic authentication for admin access
+## What it does
 
-## Tech Stack
+| Page | Purpose |
+|---|---|
+| `/` | Today's set: progress ring, the current question card (problem + lecture links), `Solved` / `Needs revision` / `Skip` actions |
+| `/questions` | Read-only question bank with topic filters and client-side search |
+| `/settings` | Daily set size (1–50) |
 
-- **Backend**: Spring Boot 3.5.9, Java 21
-- **Database**: PostgreSQL 16 with Flyway migrations
-- **UI**: Thymeleaf templates with Pico CSS
-- **Charts**: Chart.js
-- **API Docs**: SpringDoc OpenAPI (Swagger UI)
+Questions are **seeded from Excel only** — there is no add/edit/delete UI.
 
-## Prerequisites
+### Daily set algorithm
 
-- Java 21+
-- Maven 3.9+
-- PostgreSQL 16 (or Docker)
+The set for a date is derived from `sha256(YYYY-MM-DD)`, so it is identical on
+every reload and survives redeploys. Within that deterministic stream:
 
-## Local Development Setup
-
-### 1. Database Setup
-
-Start PostgreSQL using Docker:
-```bash
-docker-compose up -d postgres
+```
+weight = (1 + importance/5)          # Excel priority column, 0–5
+       × (1 + daysSinceLastAttempt/14) # stale questions float up
+       × 1/(1 + solveCount)            # weak questions float up
+       × topicBoost                    # under-practised topics float up
 ```
 
-Or configure your local PostgreSQL:
-- Database: `dsa_tracker`
-- Username: `rakesh`
-- Password: `rakesh123_admin`
-- Port: `5432`
+Questions solved within `LOOKBACK_DAYS` (default 7) are excluded, selection is
+without replacement, and topics are spread so one sheet cannot dominate a day.
+The chosen set is persisted in `daily_sets`, so it never shifts mid-day.
 
-### 2. Configure Credentials
-
-Edit `src/main/resources/application-dev.yaml`:
-```yaml
-app:
-  security:
-    admin-username: your-username
-    admin-password: your-secure-password
-```
-
-### 3. Run the Application
+## Quick start (local)
 
 ```bash
-./mvnw spring-boot:run
+# 1. Postgres
+docker compose up -d
+
+# 2. Import the question bank (docs/DSA Pactice List.xlsx)
+export DATABASE_URL='postgres://dsa:dsa_local@localhost:5432/dsa_tracker?sslmode=disable'
+go run ./cmd/seed
+
+# 3. Run
+export AUTH_PASSWORD='choose-a-strong-password'   # dev only; see production
+go run ./cmd/server                                # http://localhost:8080
 ```
 
-The application will be available at: http://localhost:7008
+Override the port with `PORT=7008`.
 
-### Default Credentials (Development)
-
-- Username: `admin`
-- Password: `admin123`
-
-**Important**: Change these in production!
-
-## Profiles
-
-The application supports Spring profiles:
-
-| Profile | Port | Description |
-|---------|------|-------------|
-| `dev` (default) | 7008 | Development with debug logging, Swagger UI enabled |
-| `prod` | 5050 | Production with minimal logging, Swagger disabled |
-
-Run with specific profile:
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
-```
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `GITHUB_BACKUP_TOKEN` | GitHub Personal Access Token for backups | - |
-| `ADMIN_USERNAME` | Admin username (prod) | `admin` |
-| `ADMIN_PASSWORD` | Admin password (prod) | - |
-
-## API Endpoints
-
-### Public Endpoints (No Auth Required)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | Home page |
-| GET | `/questions` | Question list |
-| GET | `/dashboard` | Analytics dashboard |
-| GET | `/api/suggestions/topics?q=` | Search topics |
-| GET | `/api/suggestions/patterns?q=` | Search patterns |
-
-### Protected Endpoints (Auth Required)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/questions` | Create question |
-| POST | `/questions/{id}` | Update question |
-| GET | `/questions/{id}/solve` | Increment solve count |
-| GET | `/questions/{id}/revise` | Increment revise count |
-| POST | `/questions/{id}/delete` | Delete question |
-| GET | `/api/questions` | List all questions (API) |
-| POST | `/api/questions` | Create question (API) |
-| PUT | `/api/questions/{id}/update` | Update question (API) |
-| DELETE | `/api/questions/{id}` | Delete question (API) |
-| GET | `/api/ops/export/excel` | Export to Excel |
-| GET | `/api/ops/backup` | Trigger GitHub backup |
-
-### API Documentation
-
-Swagger UI: http://localhost:7008/swagger-ui.html
-API Docs JSON: http://localhost:7008/api-docs
-
-## Database Schema
-
-### Tables
-
-- `questions` - Main question table with metadata
-- `topics` - Topic reference table
-- `patterns` - Pattern reference table
-- `question_topics` - Many-to-many relationship
-- `question_patterns` - Many-to-many relationship
-
-### Question Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| id | BIGSERIAL | Primary key |
-| problem_name | VARCHAR | Question name |
-| problem_link | TEXT | URL to problem |
-| platform | VARCHAR | LEETCODE, GFG, etc. |
-| difficulty | VARCHAR | EASY, MEDIUM, HARD |
-| video_id | VARCHAR | Optional video reference |
-| solve_count | INTEGER | Times solved |
-| revise_count | INTEGER | Times revised |
-| last_attempted_at | TIMESTAMPTZ | Last activity timestamp |
-| created_at | TIMESTAMPTZ | Creation timestamp |
-| updated_at | TIMESTAMPTZ | Last update timestamp |
-
-## Docker Deployment
-
-### Build the Application
+### Build the CSS
 
 ```bash
-./mvnw clean package -DskipTests
-docker build -t dsa-tracker-app:latest .
+npm install
+npm run build:css      # web/static/src/app.css -> web/static/app.css
+npm run watch:css      # during development
 ```
 
-### Run with Docker Compose
+`web/static/app.css` is committed so `go run` works without Node.
+
+## Configuration
+
+| Variable | Default | Notes |
+|---|---|---|
+| `DATABASE_URL` | — | required, e.g. `postgres://user:pass@host/db?sslmode=require` |
+| `AUTH_PASSWORD_HASH` | — | **production**: Argon2id PHC hash (see below) |
+| `AUTH_PASSWORD` | — | **dev only**: hashed at boot when the hash is absent |
+| `PORT` | `8080` | Vercel injects its own port |
+| `APP_TZ` | `Asia/Kolkata` | drives the "day" boundary for daily sets |
+| `DEFAULT_DAILY_SIZE` | `5` | used until `daily_size` is set in the UI |
+| `LOOKBACK_DAYS` | `7` | solved-within window excluded from the pool |
+| `SESSION_TTL_DAYS` | `30` | session cookie / DB session lifetime |
+
+Generate the production hash:
 
 ```bash
-docker-compose -f docker-compose.yml.local up -d
+go run ./cmd/hashpw -          # reads the password from the terminal, hidden
+# prints: $argon2id$v=19$m=65536,t=2,p=1$...$...
 ```
 
-The application will be available at: http://localhost:5050
+## Security model
 
-### Production Environment Variables
+Public URL, single owner:
 
-```bash
-export ADMIN_USERNAME=your-admin-user
-export ADMIN_PASSWORD=your-secure-password
-export GITHUB_BACKUP_TOKEN=ghp_your_github_token
-```
+- Argon2id password verification, constant-time comparison
+- Server-side sessions in Postgres (only the SHA-256 of the token is stored),
+  httpOnly + `Secure` + `SameSite=Strict` cookie
+- Login rate limit: 5 attempts / 15 minutes per IP
+- Per-session CSRF token required on every state-changing POST
+- CSP, `X-Frame-Options: DENY`, nosniff, referrer policy on every response
+- Every route except `/login`, `/static/*` and `/healthz` requires a session
 
-## Testing
+## Deploy to Vercel
 
-```bash
-# Run all tests
-./mvnw test
+1. Push the repository to GitHub and import it in Vercel (preset: **Container**),
+   or run `vercel deploy` with the CLI. Vercel builds `Dockerfile.vercel`.
+2. Create a free [Neon](https://neon.com) project in **AWS Asia Pacific (Singapore)**
+   and copy the pooled connection string.
+3. Set the project environment variables:
 
-# Run specific test class
-./mvnw test -Dtest=QuestionServiceUtilTest
-
-# Run with coverage
-./mvnw test jacoco:report
-```
-
-## Project Structure
-
-```
-src/main/java/com/rakesh/dsa/tracker/
-├── DsaTrackerApplication.java    # Main entry point
-├── config/
-│   └── SecurityConfig.java       # Spring Security config
-├── controller/
-│   ├── ui/                       # Thymeleaf controllers
-│   │   ├── HomeController.java
-│   │   ├── DashboardController.java
-│   │   ├── QuestionListController.java
-│   │   ├── QuestionFormController.java
-│   │   └── QuestionActionController.java
-│   └── api/                      # REST controllers
-│       ├── QuestionController.java
-│       ├── SuggestionController.java
-│       └── DataOpsController.java
-├── service/
-│   ├── QuestionService.java
-│   ├── QuestionServiceImpl.java
-│   ├── StatsService.java
-│   ├── BackupService.java
-│   └── ExcelExportService.java
-├── repository/                    # JPA repositories
-├── model/                        # Entities and DTOs
-├── github/                       # GitHub backup logic
-├── schedule/                     # Scheduled tasks
-└── props/                        # Configuration properties
-
-src/main/resources/
-├── templates/                     # Thymeleaf templates
-│   ├── layout/                   # Layout fragments
-│   ├── fragments/                # Reusable fragments
-│   └── *.html                    # Pages
-├── static/css/                   # Stylesheets
-├── static/js/                    # JavaScript
-└── db/migration/                 # Flyway migrations
-```
-
-## GitHub Backup
-
-The application automatically backs up your data to a GitHub repository:
-
-1. Create a GitHub Personal Access Token with `repo` scope
-2. Set the token as environment variable: `GITHUB_BACKUP_TOKEN`
-3. Configure GitHub settings in your application config:
-   ```yaml
-   app:
-     github:
-       username: your-github-username
-       repo: dsa-tracker-backups
-       branch: main
+   ```
+   DATABASE_URL=<neon pooled connection string>
+   AUTH_PASSWORD_HASH=<from go run ./cmd/hashpw ->
+   APP_TZ=Asia/Kolkata
    ```
 
-Backups are scheduled:
-- 10:00 AM daily (nightly)
-- 1:00 PM daily (daily)
+4. Seed the database once from your machine:
 
-## Actuator Endpoints
+   ```bash
+   DATABASE_URL='<neon url>' go run ./cmd/seed
+   ```
 
-Health and metrics available at:
-- `/actuator/health` - Health check
-- `/actuator/info` - Application info
-- `/actuator/metrics` - Application metrics
-- `/actuator/prometheus` - Prometheus metrics
+5. Optional: set the function region to `sin1` (closest to the Neon region).
 
-## License
+Container disk on Vercel is ephemeral, which is why all state lives in Neon.
 
-MIT License
+## Commands
+
+```bash
+go build ./...        # compile everything
+go vet ./...          # static analysis
+go test ./...         # randomizer + auth + seed unit tests
+gofmt -l .            # formatting check
+docker compose up -d  # local Postgres
+docker build -t dsa-tracker .   # local image
+```
+
+## Project structure
+
+```
+cmd/server/        HTTP entrypoint, graceful shutdown
+cmd/seed/          Excel -> Postgres import (excelize)
+cmd/hashpw/        Argon2id hash generator
+internal/config/   env configuration
+internal/store/    pgx access + embedded SQL migrations
+internal/daily/    daily-set randomizer (pure, unit tested)
+internal/auth/     password hashing, tokens, rate limiter
+internal/server/   router, middleware, handlers, views
+web/templates/     html/template pages
+web/static/        Tailwind source + compiled CSS + small JS
+docs/              DSA Pactice List.xlsx (source of truth for questions)
+```

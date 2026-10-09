@@ -1,0 +1,10 @@
+.git
+.github
+node_modules
+docs
+*.md
+Dockerfile
+Dockerfile.vercel
+docker-compose*.yml
+.gitattributes
+.gitignore

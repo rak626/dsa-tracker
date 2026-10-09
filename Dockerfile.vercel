@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Local image build — identical to Dockerfile.vercel (Vercel requires that name).
+# Vercel container build. The server must listen on $PORT (defaults to 80).
 
 FROM node:24-alpine AS css
 WORKDIR /src

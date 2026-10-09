@@ -1,0 +1,19 @@
+{{define "login"}}
+{{template "header" .}}
+  <div class="mx-auto max-w-sm pt-6 sm:pt-16">
+    <h1 class="text-2xl font-semibold tracking-tight">Sign in</h1>
+    <p class="mt-1 text-sm text-muted">Private instance — only the owner has access.</p>
+
+    <form method="post" action="/login" class="card mt-6 space-y-4">
+      <input type="hidden" name="next" value="{{.Next}}">
+      <label class="block">
+        <span class="mb-1.5 block text-sm text-muted">Password</span>
+        <input class="input" type="password" name="password" autocomplete="current-password"
+               autofocus required minlength="8">
+      </label>
+      {{if .Error}}<p class="text-sm text-danger">{{.Error}}</p>{{end}}
+      <button class="btn btn-primary w-full" type="submit">Sign in</button>
+    </form>
+  </div>
+{{template "footer" .}}
+{{end}}

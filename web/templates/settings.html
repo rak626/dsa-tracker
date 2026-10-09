@@ -1,0 +1,30 @@
+{{define "settings"}}
+{{template "header" .}}
+  <div class="max-w-xl">
+    <p class="text-xs uppercase tracking-widest text-muted">Preferences</p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight">Settings</h1>
+
+    <form method="post" action="/settings" class="card mt-6 space-y-5">
+      <input type="hidden" name="_csrf" value="{{.CSRF}}">
+      <label class="block">
+        <span class="mb-1.5 block text-sm">Questions per day</span>
+        <span class="text-xs text-muted">How many questions your daily set should contain (1–50). Today's set re-rolls only while it is untouched; once you start marking questions it stays until midnight.</span>
+        <input class="input mt-2" type="number" name="daily_size" min="1" max="50" value="{{.DailySize}}" required>
+      </label>
+      <div class="flex gap-2">
+        {{range $n := MakeSeq 3 15}}
+          <button class="btn btn-ghost btn-sm" type="button" data-set-size="{{$n}}">{{$n}}</button>
+        {{end}}
+      </div>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </form>
+
+    <dl class="mt-6 grid gap-3 text-sm sm:grid-cols-2">
+      <div class="card"><dt class="text-muted">Question bank</dt><dd class="mt-1 font-medium">{{.QuestionCount}} questions</dd></div>
+      <div class="card"><dt class="text-muted">Timezone</dt><dd class="mt-1 font-medium">{{.TimeZone}}</dd></div>
+      <div class="card"><dt class="text-muted">Exclusion window</dt><dd class="mt-1 font-medium">Solved in the last {{.LookbackDays}} days are skipped</dd></div>
+      <div class="card"><dt class="text-muted">Daily set changes</dt><dd class="mt-1 font-medium">Midnight, local time</dd></div>
+    </dl>
+  </div>
+{{template "footer" .}}
+{{end}}
