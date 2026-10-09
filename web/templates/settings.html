@@ -13,13 +13,15 @@
         <p class="eyebrow">Daily set</p>
         <label class="field-label mt-3 block" for="daily_size">Questions per day</label>
         <p class="field-hint mb-3">How many questions each daily set should contain (1–50). Today's set re-rolls only while it is untouched.</p>
-        <input class="input max-w-[9rem]" type="number" id="daily_size" name="daily_size" min="1" max="50"
-               value="{{.DailySize}}" required>
-        <div class="seg mt-3">
-          {{$size := .DailySize}}
-          {{range list 3 5 7 10 15 20}}
-            <button class="seg-btn {{if eq . $size}}seg-on{{end}}" type="button" data-set-size="{{.}}">{{.}}</button>
-          {{end}}
+        <div class="flex flex-wrap items-center gap-3">
+          <input class="input h-10 w-[6.5rem]" type="number" id="daily_size" name="daily_size" min="1" max="50"
+                 value="{{.DailySize}}" required>
+          <div class="seg">
+            {{$size := .DailySize}}
+            {{range list 3 5 7 10 15 20}}
+              <button class="seg-btn {{if eq . $size}}seg-on{{end}}" type="button" data-set-size="{{.}}">{{.}}</button>
+            {{end}}
+          </div>
         </div>
       </div>
 

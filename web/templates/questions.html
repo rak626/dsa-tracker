@@ -13,18 +13,18 @@
     </div>
   </div>
 
-  <div class="sticky top-14 z-30 -mx-4 mt-6 border-b border-edge bg-bg/85 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
-    <div class="flex flex-col gap-3">
+  <div class="sticky top-14 z-30 -mx-4 mt-5 border-b border-edge bg-bg/85 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6">
+    <div class="flex flex-col gap-2.5">
       <div class="relative">
         <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
         </svg>
-        <input class="input input-search" type="search" id="q-search"
+        <input class="input input-search h-10" type="search" id="q-search"
                placeholder="Search by title, topic or platform…" autocomplete="off">
         <kbd class="kbd absolute right-3 top-1/2 hidden -translate-y-1/2 sm:inline-grid">/</kbd>
       </div>
-      <div class="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="list">
+      <div class="scroll-row -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="list">
         <a class="chip {{if eq .ActiveTopic ""}}chip-on{{end}}" href="/questions">All</a>
         {{range .Topics}}
           <a class="chip {{if eq $.ActiveTopic .}}chip-on{{end}}" href="/questions?topic={{urlquery .}}">{{.}}</a>
@@ -37,7 +37,7 @@
     No questions match that search. Try a different keyword.
   </p>
 
-  <ul class="stagger mt-5 space-y-2" id="q-list">
+  <ul class="stagger mt-4 space-y-1.5" id="q-list">
     {{range .Rows}}
     <li class="row" data-search="{{lower .Question.Title}} {{lower .Question.Platform}} {{lower (join .Question.Topics " ")}} {{lower .Question.Subtopic}}">
       <span class="status-dot {{if eq .TodayAction "solve"}}status-dot-solve{{else if eq .TodayAction "revise"}}status-dot-revise{{else if eq .TodayAction "skip"}}status-dot-skip{{end}}"></span>
@@ -47,8 +47,8 @@
         {{else}}
           <span class="block truncate">{{.Question.Title}}</span>
         {{end}}
-        <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
-          {{range .Question.Topics}}<span class="chip chip-soft">{{.}}</span>{{end}}
+        <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
+          {{range .Question.Topics}}<span class="chip chip-soft chip-xs">{{.}}</span>{{end}}
           {{if .Question.Platform}}<span class="font-medium text-muted">{{.Question.Platform}}</span>{{end}}
           {{if .Question.HasPriority}}<span class="text-warn">priority {{.Question.ImportanceLabel}}/5</span>{{end}}
         </div>
