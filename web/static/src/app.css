@@ -592,6 +592,69 @@
     letter-spacing: 0.07em;
   }
 
+  /* ------------------------------------------------------------ heatmap */
+  .heat-cell {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-edge);
+    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted);
+  }
+  @media (min-width: 640px) {
+    .heat-cell {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+  .heat-cell-head {
+    background: transparent;
+    border-color: transparent;
+    font-size: 0.62rem;
+    font-weight: 550;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .heat-cell-pad {
+    visibility: hidden;
+  }
+  .heat-cell-legend {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 0.3rem;
+  }
+  .heat-l1 {
+    background: color-mix(in oklab, var(--color-brand) 24%, var(--color-surface));
+    border-color: color-mix(in oklab, var(--color-brand) 40%, transparent);
+    color: var(--color-brand);
+  }
+  .heat-l2 {
+    background: color-mix(in oklab, var(--color-brand) 46%, var(--color-surface));
+    border-color: color-mix(in oklab, var(--color-brand) 60%, transparent);
+    color: var(--color-brand-ink);
+  }
+  .heat-l3 {
+    background: linear-gradient(
+      180deg,
+      var(--color-brand),
+      var(--color-brand-strong)
+    );
+    border-color: transparent;
+    color: var(--color-brand-ink);
+    font-weight: 600;
+  }
+  .heat-cell-future {
+    opacity: 0.3;
+  }
+  .heat-cell-today {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 1px;
+  }
+
   /* --------------------------------------------------------------- kbd */
   .kbd {
     display: inline-grid;

@@ -26,7 +26,8 @@ HTML. No SPA, no Java/Maven.
 
 ## Testing
 - Unit tests only: `internal/daily/randomizer_test.go` (determinism, exclusion,
-  spread), `internal/auth/*_test.go` (argon2, ratelimit), `cmd/seed/main_test.go`
+  spread), `internal/stats/stats_test.go` (streaks, month grid, heat levels),
+  `internal/auth/*_test.go` (argon2, ratelimit), `cmd/seed/main_test.go`
   (Excel cleaning/dedupe fixtures)
 - No HTTP tests yet; verify manually with curl (see below)
 
@@ -51,16 +52,18 @@ cmd/hashpw/        Argon2id hash generator
 internal/config/   env config (load() with requireAuth flag)
 internal/store/    pgx pool, questions/daily/sessions, migrations
 internal/daily/    deterministic weighted daily-set randomizer
+internal/stats/    streaks + month heatmap (pure, unit tested)
 internal/auth/     password, tokens, rate limiter
 internal/server/   router, middleware, handlers, view data
-web/templates/     base + login/today/questions/settings
+web/templates/     base + login/today/questions/stats/settings
 web/static/        src/app.css (Tailwind), compiled app.css, app.js
 docs/              DSA Pactice List.xlsx (question bank source of truth)
 ```
 
 ## Conventions
 - Handlers are thin; SQL lives in `internal/store`; randomness/selection logic is
-  pure in `internal/daily` so it stays unit-testable
+  pure in `internal/daily` and streak/heatmap math in `internal/stats` so both
+  stay unit-testable
 - Templates get one `viewData` struct per page; navigation/flash live in `base.html`
 - Mutations go through `POST` + `_csrf`; success/failure surfaces as
   `?notice=` / `?error=` query params

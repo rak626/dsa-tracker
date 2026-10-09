@@ -137,6 +137,7 @@ cmd/hashpw/        Argon2id hash generator
 internal/config/   env configuration
 internal/store/    pgx access + embedded SQL migrations
 internal/daily/    daily-set randomizer (pure, unit tested)
+internal/stats/    streaks + month heatmap (pure, unit tested)
 internal/auth/     password hashing, tokens, rate limiter
 internal/server/   router, middleware, handlers, views
 web/templates/     html/template pages

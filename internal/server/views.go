@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rakesh/dsa-tracker/internal/stats"
 	"github.com/rakesh/dsa-tracker/internal/store"
 )
 
@@ -61,6 +62,26 @@ type settingsView struct {
 	LookbackDays  int
 	TimeZone      string
 	QuestionCount int
+}
+
+type statsView struct {
+	viewData
+	MonthLabel    string
+	PrevMonth     string
+	NextMonth     string
+	CanGoNext     bool
+	CurrentStreak int
+	LongestStreak int
+	ActiveDays    int
+	TotalEntries  int
+	MonthActive   int
+	MonthEntries  int
+	MonthSolves   int
+	BestDay       string
+	Weeks         [][]stats.Cell
+	Weekdays      []string
+	Today         time.Time
+	HasActivity   bool
 }
 
 // base builds the common view data for a request.

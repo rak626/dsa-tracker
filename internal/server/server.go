@@ -15,6 +15,7 @@ import (
 
 	"github.com/rakesh/dsa-tracker/internal/auth"
 	"github.com/rakesh/dsa-tracker/internal/config"
+	"github.com/rakesh/dsa-tracker/internal/stats"
 	"github.com/rakesh/dsa-tracker/internal/store"
 	"github.com/rakesh/dsa-tracker/web"
 )
@@ -60,7 +61,7 @@ func New(cfg *config.Config, st *store.Store, logger *slog.Logger) (*Server, err
 	}, nil
 }
 
-var viewPages = []string{"login", "today", "questions", "settings"}
+var viewPages = []string{"login", "today", "questions", "settings", "stats"}
 
 func parseViews() (map[string]*template.Template, error) {
 	funcs := template.FuncMap{
@@ -82,6 +83,35 @@ func parseViews() (map[string]*template.Template, error) {
 			return out
 		},
 		"list": func(values ...int) []int { return values },
+		// heatLevel buckets a day's entry count for heatmap colouring.
+		"heatLevel": stats.HeatLevel,
+		// cellTitle builds the hover tooltip for a heatmap cell.
+		"cellTitle": func(c stats.Cell) string {
+			if c.Padding {
+				return ""
+			}
+			label := c.Day.Format("2 Jan")
+			if c.Stat.Entries == 0 {
+				return label + " — no practice"
+			}
+			noun := "entries"
+			if c.Stat.Entries == 1 {
+				noun = "entry"
+			}
+			solved := ""
+			if c.Stat.Solved > 0 {
+				verb := "solves"
+				if c.Stat.Solved == 1 {
+					verb = "solve"
+				}
+				solved = fmt.Sprintf(" (%d %s)", c.Stat.Solved, verb)
+			}
+			return fmt.Sprintf("%s — %d %s%s", label, c.Stat.Entries, noun, solved)
+		},
+		// sameDay reports whether two timestamps fall on the same date.
+		"sameDay": func(a, b time.Time) bool {
+			return a.Year() == b.Year() && a.YearDay() == b.YearDay()
+		},
 		// ringOffset returns the SVG stroke offset for a 26px radius circle.
 		"ringOffset": func(done, total int) string {
 			const circumference = 163.36
@@ -119,6 +149,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /{$}", s.requireAuth(s.todayPage))
 	mux.HandleFunc("GET /questions", s.requireAuth(s.questionsPage))
 	mux.HandleFunc("GET /settings", s.requireAuth(s.settingsPage))
+	mux.HandleFunc("GET /stats", s.requireAuth(s.statsPage))
 	mux.HandleFunc("POST /settings", s.requireAuth(s.requireCSRF(s.settingsSave)))
 	mux.HandleFunc("POST /practice", s.requireAuth(s.requireCSRF(s.practiceSubmit)))
 	mux.HandleFunc("POST /logout", s.requireAuth(s.requireCSRF(s.logout)))

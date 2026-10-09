@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/rakesh/dsa-tracker/internal/auth"
 	"github.com/rakesh/dsa-tracker/internal/daily"
+	"github.com/rakesh/dsa-tracker/internal/stats"
 	"github.com/rakesh/dsa-tracker/internal/store"
 )
 
@@ -296,6 +298,70 @@ func (s *Server) settingsSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	redirectTo(w, r, "/settings", "notice", "Saved")
+}
+
+// ---------------------------------------------------------------- stats
+
+// statsPage renders streaks and the monthly activity heatmap. The ?month=
+// parameter selects a YYYY-MM month; malformed or future values fall back
+// to the current month.
+func (s *Server) statsPage(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	today := s.today()
+	firstOfMonth := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, time.UTC)
+
+	month := firstOfMonth
+	if v := strings.TrimSpace(r.URL.Query().Get("month")); v != "" {
+		if parsed, err := time.Parse("2006-01", v); err == nil {
+			m := time.Date(parsed.Year(), parsed.Month(), 1, 0, 0, 0, 0, time.UTC)
+			if !m.After(firstOfMonth) {
+				month = m
+			}
+		}
+	}
+
+	activity := map[time.Time]stats.DayStat{}
+	if rows, err := s.Store.ActivityByDay(ctx); err != nil {
+		s.log.Error("load activity", "error", err)
+	} else {
+		for d, st := range rows {
+			activity[d] = stats.DayStat{Entries: st.Entries, Solved: st.Solved}
+		}
+	}
+
+	current, longest := stats.Streaks(activity, today)
+	activeDays, totalEntries := stats.Totals(activity)
+	monthActive, monthEntries, monthSolves := stats.MonthTotals(activity, month)
+
+	best := "—"
+	if bestDay, bestStat, found := stats.BestDay(activity, month); found {
+		noun := "entries"
+		if bestStat.Entries == 1 {
+			noun = "entry"
+		}
+		best = fmt.Sprintf("%s · %d %s", bestDay.Format("2 Jan"), bestStat.Entries, noun)
+	}
+
+	view := statsView{
+		viewData:      s.base(r, "Stats", "stats"),
+		MonthLabel:    month.Format("January 2006"),
+		PrevMonth:     month.AddDate(0, -1, 0).Format("2006-01"),
+		NextMonth:     month.AddDate(0, 1, 0).Format("2006-01"),
+		CanGoNext:     month.Before(firstOfMonth),
+		CurrentStreak: current,
+		LongestStreak: longest,
+		ActiveDays:    activeDays,
+		TotalEntries:  totalEntries,
+		MonthActive:   monthActive,
+		MonthEntries:  monthEntries,
+		MonthSolves:   monthSolves,
+		BestDay:       best,
+		Weeks:         stats.Month(month.Year(), month.Month(), activity, today),
+		Weekdays:      []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"},
+		Today:         today,
+		HasActivity:   len(activity) > 0,
+	}
+	s.render(w, "stats", view)
 }
 
 // ---------------------------------------------------------------- practice

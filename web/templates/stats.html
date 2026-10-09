@@ -1,0 +1,83 @@
+{{define "stats"}}
+{{template "header" .}}
+  <div class="animate-rise">
+    <p class="eyebrow">Progress</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Stats</h1>
+    <p class="mt-2 text-sm text-muted">Streaks and daily activity.</p>
+  </div>
+
+  <section class="stagger mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div class="tile"><p class="tile-value text-brand">{{.CurrentStreak}}</p><p class="tile-label">current streak</p></div>
+    <div class="tile"><p class="tile-value">{{.LongestStreak}}</p><p class="tile-label">longest streak</p></div>
+    <div class="tile"><p class="tile-value">{{.ActiveDays}}</p><p class="tile-label">active days</p></div>
+    <div class="tile"><p class="tile-value">{{.TotalEntries}}</p><p class="tile-label">practice entries</p></div>
+  </section>
+
+  <section class="card mt-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <p class="eyebrow">Activity</p>
+      <div class="flex items-center gap-1">
+        <a class="btn btn-icon" href="/stats?month={{.PrevMonth}}" aria-label="Previous month" title="Previous month">
+          <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </a>
+        <span class="min-w-28 px-1 text-center text-sm font-medium tabular-nums">{{.MonthLabel}}</span>
+        {{if .CanGoNext}}
+        <a class="btn btn-icon" href="/stats?month={{.NextMonth}}" aria-label="Next month" title="Next month">
+          <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+        </a>
+        {{else}}
+        <span class="btn btn-icon cursor-default opacity-35" aria-disabled="true" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+        </span>
+        {{end}}
+      </div>
+    </div>
+
+    {{if .HasActivity}}
+    <div class="mt-5 grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-8">
+      <div class="w-fit">
+        <div class="grid grid-cols-7 gap-1.5" aria-hidden="true">
+          {{range .Weekdays}}<span class="heat-cell heat-cell-head">{{.}}</span>{{end}}
+        </div>
+        {{range .Weeks}}
+        <div class="mt-1.5 grid grid-cols-7 gap-1.5">
+          {{range .}}
+            {{if .Padding}}
+              <span class="heat-cell heat-cell-pad" aria-hidden="true"></span>
+            {{else}}
+              <span class="heat-cell heat-l{{heatLevel .Stat.Entries}}{{if .Future}} heat-cell-future{{end}}{{if sameDay .Day $.Today}} heat-cell-today{{end}}"
+                    title="{{cellTitle .}}" role="img" aria-label="{{cellTitle .}}">{{.Day.Format "2"}}</span>
+            {{end}}
+          {{end}}
+        </div>
+        {{end}}
+      </div>
+
+      <div class="min-w-0">
+        <p class="eyebrow">This month</p>
+        <div class="mt-3">
+          <div class="shortcut-row"><span>Active days</span><span class="num">{{.MonthActive}}</span></div>
+          <div class="shortcut-row"><span>Practice entries</span><span class="num">{{.MonthEntries}}</span></div>
+          <div class="shortcut-row"><span>Solves</span><span class="num">{{.MonthSolves}}</span></div>
+          <div class="shortcut-row"><span>Best day</span><span class="text-sm text-ink">{{.BestDay}}</span></div>
+        </div>
+        <div class="mt-4 flex items-center gap-1.5 text-xs text-muted">
+          <span>Less</span>
+          <span class="heat-cell heat-cell-legend heat-l0" aria-hidden="true"></span>
+          <span class="heat-cell heat-cell-legend heat-l1" aria-hidden="true"></span>
+          <span class="heat-cell heat-cell-legend heat-l2" aria-hidden="true"></span>
+          <span class="heat-cell heat-cell-legend heat-l3" aria-hidden="true"></span>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <div class="mt-5 text-center">
+      <p class="text-sm font-medium">No practice logged yet</p>
+      <p class="mt-1.5 text-sm text-muted">Work through today's set and your heatmap will start filling in.</p>
+      <a class="btn btn-ghost mt-4" href="/">Today's set</a>
+    </div>
+    {{end}}
+  </section>
+{{template "footer" .}}
+{{end}}
